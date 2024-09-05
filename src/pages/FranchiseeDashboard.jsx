@@ -4,7 +4,7 @@ import { Navbar, Nav, NavItem } from "reactstrap";
 export default function FranchiseeDashboard() {
   return (
     <>
-      <Navbar color="light" light expand="lg">
+      <Navbar expand="lg">
         <Nav className="ml-auto" navbar>
           <NavItem>
             <Link className="nav-link" to="calculate-rental-rate">
@@ -19,7 +19,6 @@ export default function FranchiseeDashboard() {
         </Nav>
       </Navbar>
       <Outlet />
-      <p>Welcome to Franchisee Dashboard</p>
     </>
   );
 }

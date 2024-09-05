@@ -1,17 +1,26 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom/client";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import {
+  createBrowserRouter,
+  RouterProvider,
+  Navigate,
+} from "react-router-dom";
 
 import "bootstrap/dist/css/bootstrap.min.css";
+
+//import pages
 import ErrorPage from "./error-page";
 import Layout from "./components/Layout";
-
 import Home from "./pages/Home";
 import FranchiseeDashboard from "./pages/FranchiseeDashboard";
 import FranchisorDashboard from "./pages/FranchisorDashboard";
-import CommissionManagement from "./pages/CommissionManagement";
+import CommissionManagement, {
+  commissionLoader,
+} from "./pages/CommissionManagement";
 import RentalRateCalculator from "./pages/RentalRateCalculator";
-import ExpenseManagement from "./pages/ExpenseManagement";
+import ExpenseManagement, { expenseLoader } from "./pages/ExpenseManagement";
+import ExpenseCategoryManagement from "./pages/ExpenseCategoryManagement";
+import "./styles/index.css";
 
 const router = createBrowserRouter(
   [
@@ -26,12 +35,17 @@ const router = createBrowserRouter(
           element: <FranchiseeDashboard />,
           children: [
             {
+              index: true,
+              element: <Navigate to="calculate-rental-rate" />,
+            },
+            {
               path: "calculate-rental-rate",
               element: <RentalRateCalculator />,
             },
             {
               path: "expense-management",
               element: <ExpenseManagement />,
+              loader: expenseLoader,
             },
           ],
         },
@@ -40,8 +54,17 @@ const router = createBrowserRouter(
           element: <FranchisorDashboard />,
           children: [
             {
+              index: true,
+              element: <Navigate to="commission-management" />,
+            },
+            {
               path: "commission-management",
               element: <CommissionManagement />,
+              loader: commissionLoader,
+            },
+            {
+              path: "Expense-Category-management",
+              element: <ExpenseCategoryManagement />,
             },
           ],
         },

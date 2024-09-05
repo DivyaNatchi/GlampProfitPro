@@ -13,7 +13,11 @@ export default function Home() {
       <Link to="/franchisee" className="btn btn-primary">
         Go to Franchisee Dashboard
       </Link>
-      <Link to="/franchisor" className="btn btn-secondary">
+      <Link
+        to="/franchisor"
+        className="btn btn-secondary"
+        style={{ marginLeft: "10px" }}
+      >
         Go to Franchisor Dashboard
       </Link>
     </div>
