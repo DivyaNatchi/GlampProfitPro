@@ -1,6 +1,12 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  NavLink,
+  Link,
+} from "react-router-dom";
 
 // Importing Components
 import Home from "../pages/Home";
@@ -24,12 +30,22 @@ export default function Header() {
           GlampProfit Pro
         </Link>
         <Nav className="ml-auto" navbar>
-          <Link to="/franchisee" className="nav-link">
+          <NavLink
+            to="/franchisee"
+            className={({ isActive }) =>
+              isActive ? "nav-link active" : "nav-link"
+            }
+          >
             Franchisee Dashboard
-          </Link>
-          <Link to="/franchisor" className="nav-link">
+          </NavLink>
+          <NavLink
+            to="/franchisor"
+            className={({ isActive }) =>
+              isActive ? "nav-link active" : "nav-link"
+            }
+          >
             Franchisor Dashboard
-          </Link>
+          </NavLink>
         </Nav>
       </Navbar>
     </div>

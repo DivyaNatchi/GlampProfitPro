@@ -12,12 +12,13 @@ import {
 import { useLoaderData } from "react-router-dom";
 import { db } from "../db/db";
 
-// Loader function to fetch expenses from IndexedDB
+// Loader function to fetch expenses from IndexedDB expenses table
 export const expenseLoader = async () => {
   const expenses = await db.expenses.toArray();
   return { expenses };
 };
 
+//Define the expense categroy dropdown
 const categories = [
   { id: 1, name: "Daily", multiplier: 30.44 }, // 30 days in a month
   { id: 2, name: "Weekly", multiplier: 4.345 }, // Approx 4.33 weeks in a month
@@ -55,10 +56,12 @@ export default function ExpenseManagement() {
     setNewExpense({ ...newExpense, [name]: value });
   };
 
+  //validation for amount field
   const validateAmount = (amount) => {
     return !isNaN(amount) && Number(amount) > 0;
   };
 
+  //formvalidation
   const validateForm = () => {
     let formIsValid = true;
     let validationErrors = {};
@@ -82,6 +85,7 @@ export default function ExpenseManagement() {
     return formIsValid;
   };
 
+  // Handle save action
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (validateForm()) {
@@ -111,6 +115,7 @@ export default function ExpenseManagement() {
     }
   };
 
+  //Handle cancel action
   const handleCancel = () => {
     setNewExpense({
       expense_head: "",
@@ -121,6 +126,7 @@ export default function ExpenseManagement() {
     setErrors({});
   };
 
+  //monthly expense calculation
   const calculateTotalMonthlyExpenses = (expenses) => {
     const total = expenses.reduce((sum, expense) => {
       const category = categories.find(
@@ -138,6 +144,7 @@ export default function ExpenseManagement() {
   return (
     <Container>
       <Form onSubmit={handleSubmit} aria-label="Expense Management Form">
+        {/* Expense Head text field*/}
         <FormGroup>
           <Label for="expense_head">Expense Head</Label>
           <Input
@@ -151,7 +158,9 @@ export default function ExpenseManagement() {
           />
           <FormFeedback>{errors.expense_head}</FormFeedback>
         </FormGroup>
+
         <FormGroup>
+          {/* Amount Text field with number validation */}
           <Label for="amount">Amount</Label>
           <Input
             type="text"
@@ -164,6 +173,8 @@ export default function ExpenseManagement() {
           />
           <FormFeedback>{errors.amount}</FormFeedback>
         </FormGroup>
+
+        {/* Expense Category Dropdown */}
         <FormGroup>
           <Label for="categoryId">Category</Label>
           <Input
@@ -184,6 +195,8 @@ export default function ExpenseManagement() {
           </Input>
           <FormFeedback>{errors.categoryId}</FormFeedback>
         </FormGroup>
+
+        {/* Expense category description text field */}
         <FormGroup>
           <Label for="description">Description</Label>
           <Input
@@ -195,18 +208,21 @@ export default function ExpenseManagement() {
             aria-label="Description"
           />
         </FormGroup>
-        <Button type="submit" color="primary" aria-label="Add Expense">
-          Add Expense
-        </Button>
-        <Button
-          type="button"
-          color="secondary"
-          onClick={handleCancel}
-          aria-label="Cancel"
-          style={{ marginLeft: "10px" }}
-        >
-          Cancel
-        </Button>
+        {/* Add expense and Cancel Buttons */}
+        <FormGroup>
+          <Button type="submit" color="primary" aria-label="Add Expense">
+            Add Expense
+          </Button>
+          <Button
+            type="button"
+            color="secondary"
+            onClick={handleCancel}
+            aria-label="Cancel"
+            style={{ marginLeft: "10px" }}
+          >
+            Cancel
+          </Button>
+        </FormGroup>
       </Form>
 
       <h3>Total Monthly Expenses: ${totalMonthlyExpenses.toFixed(2)}</h3>

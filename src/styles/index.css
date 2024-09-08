@@ -23,6 +23,12 @@ body {
 
 .navbar .nav-link:hover {
   color: #f7941d;
+  font-weight: bold;
+}
+
+.navbar .nav-link.active {
+  color: #f7941d;
+  font-weight: bold;
 }
 
 /* Main Content Styles */
@@ -30,6 +36,22 @@ body {
   padding: 20px;
   max-width: 1200px;
   margin: 0 auto;
+}
+
+/* Slide-down animation */
+.slide-down .modal-content {
+  animation: slideDown 0.5s ease-in-out;
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 /* Footer Styles */

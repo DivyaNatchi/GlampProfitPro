@@ -9,8 +9,29 @@ import {
   FormFeedback,
   FormText,
 } from "reactstrap";
+import { useLoaderData } from "react-router-dom";
+import { db } from "../db/db";
+import RentalRateDisplay from "../card/RentalRateDisplay";
+
+// Loader function defined here to fetch data
+export async function rentalRateCalculatorLoader() {
+  // Fetch all expenses
+  const expenses = await db.expenses.toArray();
+
+  // Fetch all categories with their conversion constants
+  const categories = await db.category_constants.toArray(); // Assuming "category_constants" is the correct store name
+
+  // Fetch commission
+  const commission = await db.commissions.toArray();
+  return { expenses, categories, commission };
+}
 
 export default function RentalRateCalculator() {
+  // Use useLoaderData to access preloaded data
+  const { expenses, categories, commission } = useLoaderData();
+  const [rentalRate, setRentalRate] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
+
   const [formData, setFormData] = useState({
     month: "",
     year: "",
@@ -20,6 +41,125 @@ export default function RentalRateCalculator() {
   });
 
   const [errors, setErrors] = useState({});
+
+  const handleCloseRateDisplay = () => {
+    setRentalRate(null); // Close the rental rate display and go back to the calculator
+  };
+
+  // Function to calculate total monthly expenses
+  const calculateMonthlyExpenses = () => {
+    let totalMonthlyExpenses = 0;
+
+    expenses.forEach((expense) => {
+      let multiplier;
+
+      if (Number(expense.categoryId) === 12) {
+        multiplier = 0;
+      } else {
+        const category = categories.find(
+          (cat) => Number(cat.categoryId) === Number(expense.categoryId)
+        );
+        multiplier = category ? category.monthly_conversion_constant : 1; // Use 1 if no multiplier exists
+      }
+      totalMonthlyExpenses += expense.amount * multiplier;
+    });
+
+    console.log(
+      "Total monthly expenses calculated:",
+      totalMonthlyExpenses.toFixed(2)
+    );
+    return parseFloat(totalMonthlyExpenses.toFixed(2));
+  };
+
+  // Function to calculate per booking expenses
+  const calculatePerBookingExpenses = () => {
+    const filteredExpenses = expenses.filter(
+      (expense) => Number(expense.categoryId) === 12
+    );
+    const totalExpenses = filteredExpenses.reduce(
+      (sum, expense) => sum + expense.amount,
+      0
+    );
+    return parseFloat(totalExpenses.toFixed(2));
+  };
+
+  // Function to calculate Rental rate
+  const calculateRentalRate = (formData) => {
+    console.log("From rental rate calculation");
+    console.log(formData);
+
+    // Validate numberOfPods and expectedOccupancyPercentage
+    if (formData.numberOfPods <= 0) {
+      console.error("Number of Pods should be greater than 0.");
+      return;
+    }
+    if (
+      formData.expectedOccupancyPercentage <= 0 ||
+      formData.expectedOccupancyPercentage > 100
+    ) {
+      console.error(
+        "Expected Occupancy Percentage should be between 0 and 100."
+      );
+      return;
+    }
+
+    const category = categories.find((cat) => Number(cat.categoryId) === 1);
+
+    const occupiedRoomsPerMonth = parseFloat(
+      (
+        formData.numberOfPods *
+        (formData.expectedOccupancyPercentage / 100)
+      ).toFixed(2)
+    );
+
+    // Validate occupiedRoomsPerMonth
+    if (occupiedRoomsPerMonth <= 0) {
+      console.error("Occupied Rooms per Month should be greater than 0.");
+      return;
+    }
+
+    const totalOccupiedRoomDays = parseFloat(
+      (occupiedRoomsPerMonth * category.monthly_conversion_constant).toFixed(2)
+    );
+
+    const monthlyExpenses = calculateMonthlyExpenses();
+    const totalExpensesPerOccupiedRoomDay = parseFloat(
+      (monthlyExpenses / totalOccupiedRoomDays).toFixed(2)
+    );
+
+    const revenuePerOccupiedRoomDay = parseFloat(
+      (formData.expectedMonthlyRevenue / totalOccupiedRoomDays).toFixed(2)
+    );
+
+    const expensesPerBooking = calculatePerBookingExpenses();
+
+    const expectedRentPerDayWithAllExpenses = parseFloat(
+      (
+        totalExpensesPerOccupiedRoomDay +
+        revenuePerOccupiedRoomDay +
+        expensesPerBooking
+      ).toFixed(2)
+    );
+
+    const commissionRate = parseFloat(commission[0].commission_rate).toFixed(2);
+    // Validate commissionRate to avoid division by zero
+    if (commissionRate <= 0) {
+      console.error("Commission rate should be greater than 0.");
+      return;
+    }
+
+    const franchiserCommission = parseFloat(
+      (expectedRentPerDayWithAllExpenses / commissionRate).toFixed(2)
+    );
+
+    const expectedRentPerDayWithAllExpensesAndCommission = parseFloat(
+      (expectedRentPerDayWithAllExpenses + franchiserCommission).toFixed(2)
+    );
+
+    setRentalRate(expectedRentPerDayWithAllExpensesAndCommission);
+    setModalOpen(true);
+    return expectedRentPerDayWithAllExpensesAndCommission;
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -71,8 +211,7 @@ export default function RentalRateCalculator() {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (validateForm()) {
-      console.log("Form Data Submitted: ", formData);
-      // Perform the rental rate calculation logic here
+      calculateRentalRate(formData);
     }
   };
 
@@ -86,6 +225,9 @@ export default function RentalRateCalculator() {
     });
     setErrors({});
   };
+
+  // Toggle the modal visibility
+  const toggleModal = () => setModalOpen(!modalOpen);
 
   return (
     <Container>
@@ -217,6 +359,13 @@ export default function RentalRateCalculator() {
           </Button>
         </FormGroup>
       </Form>
+      {rentalRate !== null && (
+        <RentalRateDisplay
+          rentalRate={rentalRate}
+          isOpen={modalOpen}
+          toggle={toggleModal}
+        />
+      )}
     </Container>
   );
 }

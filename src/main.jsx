@@ -17,9 +17,13 @@ import FranchisorDashboard from "./pages/FranchisorDashboard";
 import CommissionManagement, {
   commissionLoader,
 } from "./pages/CommissionManagement";
-import RentalRateCalculator from "./pages/RentalRateCalculator";
+import RentalRateCalculator, {
+  rentalRateCalculatorLoader,
+} from "./pages/RentalRateCalculator";
 import ExpenseManagement, { expenseLoader } from "./pages/ExpenseManagement";
-import ExpenseCategoryManagement from "./pages/ExpenseCategoryManagement";
+import ExpenseCategoryManagement, {
+  expenseCategoryLoader,
+} from "./pages/ExpenseCategoryManagement";
 import "./styles/index.css";
 
 const router = createBrowserRouter(
@@ -33,6 +37,7 @@ const router = createBrowserRouter(
         {
           path: "/franchisee",
           element: <FranchiseeDashboard />,
+          errorElement: <ErrorPage />,
           children: [
             {
               index: true,
@@ -41,6 +46,7 @@ const router = createBrowserRouter(
             {
               path: "calculate-rental-rate",
               element: <RentalRateCalculator />,
+              loader: rentalRateCalculatorLoader,
             },
             {
               path: "expense-management",
@@ -52,6 +58,7 @@ const router = createBrowserRouter(
         {
           path: "/franchisor",
           element: <FranchisorDashboard />,
+          errorElement: <ErrorPage />,
           children: [
             {
               index: true,
@@ -65,6 +72,7 @@ const router = createBrowserRouter(
             {
               path: "Expense-Category-management",
               element: <ExpenseCategoryManagement />,
+              loader: expenseCategoryLoader,
             },
           ],
         },

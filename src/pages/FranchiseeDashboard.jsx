@@ -1,4 +1,4 @@
-import { Link, Outlet } from "react-router-dom";
+import { NavLink, Outlet } from "react-router-dom";
 import { Navbar, Nav, NavItem } from "reactstrap";
 
 export default function FranchiseeDashboard() {
@@ -7,14 +7,24 @@ export default function FranchiseeDashboard() {
       <Navbar expand="lg">
         <Nav className="ml-auto" navbar>
           <NavItem>
-            <Link className="nav-link" to="calculate-rental-rate">
+            <NavLink
+              className={({ isActive }) =>
+                isActive ? "nav-link active" : "nav-link"
+              }
+              to="calculate-rental-rate"
+            >
               Calculate Rental Rate
-            </Link>
+            </NavLink>
           </NavItem>
           <NavItem>
-            <Link className="nav-link" to="expense-management">
+            <NavLink
+              className={({ isActive }) =>
+                isActive ? "nav-link active" : "nav-link"
+              }
+              to="expense-management"
+            >
               Expense Management
-            </Link>
+            </NavLink>
           </NavItem>
         </Nav>
       </Navbar>

@@ -10,10 +10,10 @@ import {
   FormFeedback,
 } from "reactstrap";
 import { useLoaderData } from "react-router-dom";
-import { db } from "../db/db"; // Import IndexedDB
+import { db } from "../db/db";
 
 export const commissionLoader = async () => {
-  const existingCommission = await db.commissions.get(1); // Assuming the record always has id = 1
+  const existingCommission = await db.commissions.get(1); //Tthe record always has id = 1
   return existingCommission ? existingCommission : null;
 };
 
@@ -44,7 +44,7 @@ export default function CommissionManagement() {
 
     // Reset error state and set last updated date
     setErrors("");
-    const now = new Date().toISOString().split("T")[0]; // Extract date part only (YYYY-MM-DD)
+    const now = new Date().toISOString().split("T")[0]; // Optional: Keep track of the last update
     setLastUpdated(now);
 
     // Check if a commission record exists
@@ -67,7 +67,7 @@ export default function CommissionManagement() {
 
     // Update display state with the new commission rate
     setCommissionRateDisplay(commissionRateInput);
-    setCommissionRateInput(""); // Optionally reset input field
+    setCommissionRateInput(""); // reset input field
   };
 
   const handleChange = (e) => {
