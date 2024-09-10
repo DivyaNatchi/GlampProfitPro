@@ -12,13 +12,13 @@ export default function Home() {
           This application helps you optimize rental rates, manage expenses, and
           maximize profits for your glamping business.
         </p>
-        <p>Select your dashboard to begin</p>
+        <p>Select option to begin</p>
         <div className="cta-buttons">
           <Link to="/franchisee" size="lg">
-            Go to Franchisee
+            Franchisee
           </Link>
           <Link to="/franchisor" size="lg">
-            Go to Franchisor
+            Franchisor
           </Link>
         </div>
       </div>

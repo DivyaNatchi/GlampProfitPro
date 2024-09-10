@@ -1,29 +1,20 @@
 /* General styles for the navbar */
-.sticky-nav {
-  position: -webkit-sticky;
-  position: sticky !important;
-  top: 0 !important;
+.custom-nav {
   width: 100%;
   z-index: 1000;
-  /* background-color: rgba(
-    0,
-    0,
-    0,
-    0.7
-  ); */
   background-color: #00bf8f;
   padding: 1rem 2rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   transition: background-color 0.3s ease-in-out;
 }
 
-.sticky-nav .navbar-brand {
+.custom-nav .navbar-brand {
   font-size: 1.5rem;
   font-weight: bold;
   color: #fff;
 }
 
-.sticky-nav .nav-link {
+.custom-nav .nav-link {
   margin-left: 1.5rem;
   font-size: 1.2rem;
   font-weight: 500;
@@ -32,19 +23,37 @@
   color: #fff;
 }
 
-.sticky-nav .nav-link:hover {
+.custom-nav .nav-link:hover {
   color: #f7941d;
   font-weight: bold;
 }
 
-.sticky-nav .nav-link.active {
+.custom-nav .nav-link.active {
   color: #f7941d;
   font-weight: bold;
 }
 
+.navbar-toggler {
+  border: none;
+  background: none; /* Clean toggle button background */
+}
+
+.navbar-toggler:focus {
+  outline: none;
+}
+
+/* When collapsed, ensure the menu items stack vertically */
 @media (max-width: 768px) {
-  .sticky-nav .nav-link {
-    margin-left: 1rem;
-    font-size: 0.9rem;
+  .custom-nav .navbar-collapse {
+    text-align: right;
+  }
+
+  .custom-nav .nav-link {
+    margin-left: 0;
+    font-size: 1.1rem;
+  }
+
+  .custom-nav .nav-link {
+    display: block;
   }
 }
