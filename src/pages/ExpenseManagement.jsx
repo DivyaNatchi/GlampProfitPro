@@ -45,11 +45,11 @@ export default function ExpenseManagement() {
   });
 
   const [errors, setErrors] = useState({});
-  const [totalMonthlyExpenses, setTotalMonthlyExpenses] = useState(0);
+  // const [totalMonthlyExpenses, setTotalMonthlyExpenses] = useState(0);
 
-  useEffect(() => {
-    calculateTotalMonthlyExpenses(expenses); // Calculate total monthly expenses on component mount
-  }, [expenses]);
+  // useEffect(() => {
+  //   calculateTotalMonthlyExpenses(expenses); // Calculate total monthly expenses on component mount
+  // }, [expenses]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -127,19 +127,19 @@ export default function ExpenseManagement() {
   };
 
   //monthly expense calculation
-  const calculateTotalMonthlyExpenses = (expenses) => {
-    const total = expenses.reduce((sum, expense) => {
-      const category = categories.find(
-        (cat) => cat.id === Number(expense.categoryId)
-      );
-      if (category && category.multiplier) {
-        // Multiply the amount based on category's monthly conversion factor
-        return sum + expense.amount * category.multiplier;
-      }
-      return sum;
-    }, 0);
-    setTotalMonthlyExpenses(total);
-  };
+  // const calculateTotalMonthlyExpenses = (expenses) => {
+  //   const total = expenses.reduce((sum, expense) => {
+  //     const category = categories.find(
+  //       (cat) => cat.id === Number(expense.categoryId)
+  //     );
+  //     if (category && category.multiplier) {
+  //       // Multiply the amount based on category's monthly conversion factor
+  //       return sum + expense.amount * category.multiplier;
+  //     }
+  //     return sum;
+  //   }, 0);
+  //   setTotalMonthlyExpenses(total);
+  // };
 
   return (
     <Container>
@@ -225,9 +225,9 @@ export default function ExpenseManagement() {
         </FormGroup>
       </Form>
 
-      <h3>Total Monthly Expenses: ${totalMonthlyExpenses.toFixed(2)}</h3>
+      {/* <h3>Total Monthly Expenses: ${totalMonthlyExpenses.toFixed(2)}</h3> */}
 
-      <Table
+      {/* <Table
         hover
         responsive
         aria-label="Expense Table"
@@ -259,7 +259,7 @@ export default function ExpenseManagement() {
             </tr>
           ))}
         </tbody>
-      </Table>
+      </Table> */}
     </Container>
   );
 }

@@ -19,7 +19,7 @@ export async function rentalRateCalculatorLoader() {
   const expenses = await db.expenses.toArray();
 
   // Fetch all categories with their conversion constants
-  const categories = await db.category_constants.toArray(); // Assuming "category_constants" is the correct store name
+  const categories = await db.category_constants.toArray();
 
   // Fetch commission
   const commission = await db.commissions.toArray();
@@ -118,8 +118,13 @@ export default function RentalRateCalculator() {
       return;
     }
 
+    // Get the number of days in the month based on user input (month and year)
+    const daysInMonth = new Date(formData.year, formData.month, 0).getDate();
+    console.log("Days in month: ", daysInMonth);
+
+    // Calculate total occupied room-days using the number of days in the month
     const totalOccupiedRoomDays = parseFloat(
-      (occupiedRoomsPerMonth * category.monthly_conversion_constant).toFixed(2)
+      (occupiedRoomsPerMonth * daysInMonth).toFixed(2)
     );
 
     const monthlyExpenses = calculateMonthlyExpenses();

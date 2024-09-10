@@ -14,7 +14,7 @@ export default function RentalRateDisplayModal(props) {
       className="slide-down"
     >
       <ModalHeader toggle={toggle}>
-        <FaDollarSign size={30} /> Your Calculated Rental Rate
+        <FaDollarSign size={30} />
       </ModalHeader>
       <ModalBody
         className="text-center"

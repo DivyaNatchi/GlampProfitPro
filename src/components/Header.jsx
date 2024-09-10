@@ -1,31 +1,12 @@
 import React from "react";
-import ReactDOM from "react-dom/client";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  NavLink,
-  Link,
-} from "react-router-dom";
-
-// Importing Components
-import Home from "../pages/Home";
-
-// Import Reactstrap components
-import {
-  Navbar,
-  NavbarBrand,
-  NavbarToggler,
-  Collapse,
-  Nav,
-  NavItem,
-} from "reactstrap";
+import { Link, NavLink } from "react-router-dom";
+import { Navbar, Nav } from "reactstrap";
+import "../styles/header.css";
 
 export default function Header() {
   return (
-    <div>
-      {/* Navigation Bar using Reactstrap */}
-      <Navbar light expand="lg">
+    <>
+      <Navbar className="sticky-nav" light expand="lg">
         <Link to="/" className="navbar-brand">
           GlampProfit Pro
         </Link>
@@ -36,7 +17,7 @@ export default function Header() {
               isActive ? "nav-link active" : "nav-link"
             }
           >
-            Franchisee Dashboard
+            Franchisee
           </NavLink>
           <NavLink
             to="/franchisor"
@@ -44,10 +25,10 @@ export default function Header() {
               isActive ? "nav-link active" : "nav-link"
             }
           >
-            Franchisor Dashboard
+            Franchisor
           </NavLink>
         </Nav>
       </Navbar>
-    </div>
+    </>
   );
 }

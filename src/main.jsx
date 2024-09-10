@@ -41,7 +41,8 @@ const router = createBrowserRouter(
           children: [
             {
               index: true,
-              element: <Navigate to="calculate-rental-rate" />,
+              element: <RentalRateCalculator />,
+              loader: rentalRateCalculatorLoader,
             },
             {
               path: "calculate-rental-rate",
@@ -62,7 +63,8 @@ const router = createBrowserRouter(
           children: [
             {
               index: true,
-              element: <Navigate to="commission-management" />,
+              element: <CommissionManagement />,
+              loader: commissionLoader,
             },
             {
               path: "commission-management",

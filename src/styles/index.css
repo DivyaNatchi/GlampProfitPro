@@ -24,6 +24,7 @@ body {
 .navbar .nav-link:hover {
   color: #f7941d;
   font-weight: bold;
+  transition: border-bottom 0.3s ease;
 }
 
 .navbar .nav-link.active {
@@ -56,7 +57,7 @@ body {
 
 /* Footer Styles */
 .footer {
-  background-color: #333;
+  background-color: #00bf8f;
   color: #fff;
   padding: 20px 0;
   text-align: center;
@@ -66,8 +67,10 @@ body {
   color: #fff;
   margin: 0 10px;
   font-size: 14px;
+  transition: transform 0.3s ease, color 0.3s ease;
 }
 
-.footer a:hover {
-  text-decoration: underline;
+.footer-icons a:hover {
+  transform: scale(1.2);
+  color: #f7941d;
 }

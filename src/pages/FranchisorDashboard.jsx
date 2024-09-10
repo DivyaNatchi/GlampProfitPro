@@ -1,11 +1,13 @@
 import { Outlet, NavLink } from "react-router-dom";
 import { Navbar, Nav, NavItem } from "reactstrap";
+import "../styles/dashboard.css";
 
 export default function FranchisorDashboard() {
   return (
-    <>
-      <Navbar expand="lg">
-        <Nav className="ml-auto" navbar>
+    <div className="dashboard-container">
+      {/* Sidebar Navigation */}
+      <div className="sidebar">
+        <Nav navbar>
           <NavItem>
             <NavLink
               className={({ isActive }) =>
@@ -27,9 +29,12 @@ export default function FranchisorDashboard() {
             </NavLink>
           </NavItem>
         </Nav>
-      </Navbar>
-      <Outlet />
-      <p>Welcome to Franchisor Dashboard</p>
-    </>
+      </div>
+
+      {/* Main Content */}
+      <div className="main-content">
+        <Outlet />
+      </div>
+    </div>
   );
 }
