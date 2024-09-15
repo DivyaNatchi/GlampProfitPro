@@ -8,7 +8,7 @@ import {
 
 import "bootstrap/dist/css/bootstrap.min.css";
 
-//import pages
+// Import pages
 import ErrorPage from "./error-page";
 import Layout from "./components/Layout";
 import Home from "./pages/Home";
@@ -35,17 +35,13 @@ const router = createBrowserRouter(
       children: [
         { index: true, element: <Home /> },
         {
-          path: "/franchisee",
+          path: "franchisee",
           element: <FranchiseeDashboard />,
           errorElement: <ErrorPage />,
           children: [
             {
+              // Setting RentalRateCalculator as the index route
               index: true,
-              element: <RentalRateCalculator />,
-              loader: rentalRateCalculatorLoader,
-            },
-            {
-              path: "calculate-rental-rate",
               element: <RentalRateCalculator />,
               loader: rentalRateCalculatorLoader,
             },
@@ -57,22 +53,18 @@ const router = createBrowserRouter(
           ],
         },
         {
-          path: "/franchisor",
+          path: "franchisor",
           element: <FranchisorDashboard />,
           errorElement: <ErrorPage />,
           children: [
             {
+              // Setting CommissionManagement as the index route
               index: true,
               element: <CommissionManagement />,
               loader: commissionLoader,
             },
             {
-              path: "commission-management",
-              element: <CommissionManagement />,
-              loader: commissionLoader,
-            },
-            {
-              path: "Expense-Category-management",
+              path: "expense-category-management",
               element: <ExpenseCategoryManagement />,
               loader: expenseCategoryLoader,
             },

@@ -12,6 +12,7 @@ import {
 import { useLoaderData } from "react-router-dom";
 import { db } from "../db/db";
 import RentalRateDisplay from "../card/RentalRateDisplay";
+import "../styles/form.css";
 
 // Loader function defined here to fetch data
 export async function rentalRateCalculatorLoader() {
@@ -235,57 +236,59 @@ export default function RentalRateCalculator() {
   const toggleModal = () => setModalOpen(!modalOpen);
 
   return (
-    <Container>
+    <Container className="form-container ">
       <Form onSubmit={handleSubmit} aria-label="Calculate Rental Rate Form">
-        {/* Month Dropdown */}
-        <FormGroup>
-          <Label for="month">Month</Label>
-          <Input
-            type="select"
-            id="month"
-            name="month"
-            value={formData.month}
-            onChange={handleChange}
-            aria-required="true"
-            aria-label="Month"
-          >
-            <option value="">Select Month</option>
-            <option value="1">January</option>
-            <option value="2">February</option>
-            <option value="3">March</option>
-            <option value="4">April</option>
-            <option value="5">May</option>
-            <option value="6">June</option>
-            <option value="7">July</option>
-            <option value="8">August</option>
-            <option value="9">September</option>
-            <option value="10">October</option>
-            <option value="11">November</option>
-            <option value="12">December</option>
-          </Input>
-          <FormText>
-            The month for which the rental rate is being calculated.
-          </FormText>
-        </FormGroup>
+        <div className="form-row">
+          {/* Month Dropdown */}
+          <FormGroup>
+            <Label for="month">Month</Label>
+            <Input
+              type="select"
+              id="month"
+              name="month"
+              value={formData.month}
+              onChange={handleChange}
+              aria-required="true"
+              aria-label="Month"
+            >
+              <option value="">Select Month</option>
+              <option value="1">January</option>
+              <option value="2">February</option>
+              <option value="3">March</option>
+              <option value="4">April</option>
+              <option value="5">May</option>
+              <option value="6">June</option>
+              <option value="7">July</option>
+              <option value="8">August</option>
+              <option value="9">September</option>
+              <option value="10">October</option>
+              <option value="11">November</option>
+              <option value="12">December</option>
+            </Input>
+            {/* <FormText>
+              The month for which the rental rate is being calculated.
+            </FormText> */}
+          </FormGroup>
 
-        {/* Year with Validation */}
-        <FormGroup>
-          <Label for="year">Year</Label>
-          <Input
-            type="text"
-            id="year"
-            name="year"
-            value={formData.year}
-            onChange={handleChange}
-            invalid={!!errors.year}
-            aria-required="true"
-            aria-label="year-description"
-          />
-          <FormFeedback>{errors.year}</FormFeedback>
-          <FormText>
-            The year for which the rental rate is being calculated.
-          </FormText>
-        </FormGroup>
+          {/* Year with Validation */}
+          <FormGroup>
+            <Label for="year">Year</Label>
+            <Input
+              type="text"
+              id="year"
+              name="year"
+              value={formData.year}
+              onChange={handleChange}
+              invalid={!!errors.year}
+              aria-required="true"
+              aria-label="year-description"
+            />
+            <FormFeedback>{errors.year}</FormFeedback>
+            {/* <FormText>
+              The year for which the rental rate is being calculated.
+            </FormText> */}
+          </FormGroup>
+        </div>
 
         {/* Expected Monthly Revenue with Validation */}
         <FormGroup>

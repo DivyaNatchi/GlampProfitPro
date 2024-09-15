@@ -1,20 +1,19 @@
-import React from "react";
-import { NavLink, Outlet } from "react-router-dom";
-import { Nav, NavItem } from "reactstrap";
+import { Outlet, NavLink } from "react-router-dom";
+import { Navbar, Nav, NavItem } from "reactstrap";
 import "../styles/dashboard.css";
 
 export default function FranchiseeDashboard() {
   return (
-    <div className="dashboard-container">
-      {/* Sidebar Navigation */}
-      <div className="sidebar">
-        <Nav navbar>
+    <>
+      <Navbar expand="lg">
+        <Nav className="ml-auto" navbar>
           <NavItem>
             <NavLink
               className={({ isActive }) =>
                 isActive ? "nav-link active" : "nav-link"
               }
-              to="calculate-rental-rate"
+              to="."
+              end
             >
               Calculate Rental Rate
             </NavLink>
@@ -30,12 +29,8 @@ export default function FranchiseeDashboard() {
             </NavLink>
           </NavItem>
         </Nav>
-      </div>
-
-      {/* Main Content */}
-      <div className="main-content">
-        <Outlet />
-      </div>
-    </div>
+      </Navbar>
+      <Outlet />
+    </>
   );
 }

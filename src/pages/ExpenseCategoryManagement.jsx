@@ -10,6 +10,7 @@ import {
   FormFeedback,
 } from "reactstrap";
 import { db } from "../db/db";
+import "../styles/form.css";
 
 // Loader function to fetch categories from IndexedDB category constant table
 export async function expenseCategoryLoader() {
@@ -110,7 +111,10 @@ export default function ExpenseCategoryManagement() {
   };
 
   return (
-    <Container aria-labelledby="expense-category-management">
+    <Container
+      className="form-container "
+      aria-labelledby="expense-category-management"
+    >
       <h2 id="expense-category-management">Manage Expense Categories</h2>
       <Form
         onSubmit={handleSubmit}

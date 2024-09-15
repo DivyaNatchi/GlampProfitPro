@@ -3,11 +3,17 @@
   background-color: #00bf8f;
   color: #fff;
   padding: 1rem 1rem;
+  font-size: 1.1rem;
   text-align: center;
 }
 
-.footer .copyrightText {
-  padding-top: 1rem;
-  font-size: 1.1rem;
-  text-align: left;
+.footer a {
+  text-decoration: none;
+  letter-spacing: 0.05em;
+  color: #fff;
+}
+
+.footer a:hover {
+  color: #008060;
+  font-weight: bold;
 }

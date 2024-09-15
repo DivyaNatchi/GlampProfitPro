@@ -11,6 +11,7 @@ import {
 } from "reactstrap";
 import { useLoaderData } from "react-router-dom";
 import { db } from "../db/db";
+import "../styles/form.css";
 
 export const commissionLoader = async () => {
   const existingCommission = await db.commissions.get(1); //Tthe record always has id = 1
@@ -75,8 +76,7 @@ export default function CommissionManagement() {
   };
 
   return (
-    <Container>
-      <h3>Commission Management</h3>
+    <Container className="form-container ">
       <Form onSubmit={handleSubmit} aria-label="Commission Management Form">
         <FormGroup>
           <Label for="commission_rate">Commission Rate (%)</Label>

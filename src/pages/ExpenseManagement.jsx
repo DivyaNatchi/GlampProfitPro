@@ -11,6 +11,7 @@ import {
 } from "reactstrap";
 import { useLoaderData } from "react-router-dom";
 import { db } from "../db/db";
+import "../styles/form.css";
 
 // Loader function to fetch expenses from IndexedDB expenses table
 export const expenseLoader = async () => {
@@ -142,7 +143,7 @@ export default function ExpenseManagement() {
   // };
 
   return (
-    <Container>
+    <Container className="form-container ">
       <Form onSubmit={handleSubmit} aria-label="Expense Management Form">
         {/* Expense Head text field*/}
         <FormGroup>

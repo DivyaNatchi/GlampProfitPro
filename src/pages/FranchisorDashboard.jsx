@@ -4,18 +4,18 @@ import "../styles/dashboard.css";
 
 export default function FranchisorDashboard() {
   return (
-    <div className="dashboard-container">
-      {/* Sidebar Navigation */}
-      <div className="sidebar">
-        <Nav navbar>
+    <>
+      <Navbar expand="lg">
+        <Nav className="ml-auto" navbar>
           <NavItem>
             <NavLink
               className={({ isActive }) =>
                 isActive ? "nav-link active" : "nav-link"
               }
-              to="commission-management"
+              to="."
+              end
             >
-              Commission management
+              Commission Management
             </NavLink>
           </NavItem>
           <NavItem>
@@ -23,18 +23,14 @@ export default function FranchisorDashboard() {
               className={({ isActive }) =>
                 isActive ? "nav-link active" : "nav-link"
               }
-              to="Expense-Category-management"
+              to="expense-category-management"
             >
-              Expense Category management
+              Expense Category Management
             </NavLink>
           </NavItem>
         </Nav>
-      </div>
-
-      {/* Main Content */}
-      <div className="main-content">
-        <Outlet />
-      </div>
-    </div>
+      </Navbar>
+      <Outlet />
+    </>
   );
 }
