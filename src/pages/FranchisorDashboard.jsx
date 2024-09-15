@@ -5,8 +5,8 @@ import "../styles/dashboard.css";
 export default function FranchisorDashboard() {
   return (
     <>
-      <Navbar expand="lg">
-        <Nav className="ml-auto" navbar>
+      <Navbar>
+        <Nav className="nav-row" navbar>
           <NavItem>
             <NavLink
               className={({ isActive }) =>

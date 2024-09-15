@@ -14,7 +14,7 @@ import { db } from "../db/db";
 import "../styles/form.css";
 
 export const commissionLoader = async () => {
-  const existingCommission = await db.commissions.get(1); //Tthe record always has id = 1
+  const existingCommission = await db.commissions.get(1); //The record always has id = 1
   return existingCommission ? existingCommission : null;
 };
 
@@ -76,30 +76,39 @@ export default function CommissionManagement() {
   };
 
   return (
-    <Container className="form-container ">
+    <Container className="form-container">
       <Form onSubmit={handleSubmit} aria-label="Commission Management Form">
-        <FormGroup>
-          <Label for="commission_rate">Commission Rate (%)</Label>
-          <Input
-            type="text"
-            name="commission_rate"
-            id="commission_rate"
-            value={commissionRateInput}
-            onChange={handleChange}
-            invalid={!!errors}
-            aria-label="Commission Rate Input"
-            aria-describedby="commission-rate-error"
-          />
-          {errors && (
-            <FormFeedback id="commission-rate-error">{errors}</FormFeedback>
-          )}
-        </FormGroup>
-        <Button type="submit" color="primary" aria-label="Save Commission Rate">
-          Save
-        </Button>
+        <fieldset className="my-fieldset">
+          <legend className="legend">Commission Management</legend>
+          <FormGroup>
+            <Label for="commission_rate">Commission Rate (%)</Label>
+            <Input
+              type="text"
+              name="commission_rate"
+              id="commission_rate"
+              value={commissionRateInput}
+              onChange={handleChange}
+              invalid={!!errors}
+              aria-label="Commission Rate Input"
+              aria-describedby="commission-rate-error"
+            />
+            {errors && (
+              <FormFeedback id="commission-rate-error">{errors}</FormFeedback>
+            )}
+          </FormGroup>
+          <FormGroup className="text-center form-btn">
+            <Button
+              type="submit"
+              color="primary"
+              aria-label="Save Commission Rate"
+            >
+              Save
+            </Button>
+          </FormGroup>
+        </fieldset>
       </Form>
       {lastUpdated && (
-        <p>
+        <p className="mt-3">
           Last Updated Commission Rate:{" "}
           <strong>{commissionRateDisplay}%</strong>
           <br />

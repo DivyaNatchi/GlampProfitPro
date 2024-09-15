@@ -143,87 +143,90 @@ export default function ExpenseManagement() {
   // };
 
   return (
-    <Container className="form-container ">
+    <Container className="form-container">
       <Form onSubmit={handleSubmit} aria-label="Expense Management Form">
-        {/* Expense Head text field*/}
-        <FormGroup>
-          <Label for="expense_head">Expense Head</Label>
-          <Input
-            type="text"
-            name="expense_head"
-            id="expense_head"
-            value={newExpense.expense_head}
-            onChange={handleChange}
-            invalid={!!errors.expense_head}
-            aria-label="Expense Head"
-          />
-          <FormFeedback>{errors.expense_head}</FormFeedback>
-        </FormGroup>
+        <fieldset className="my-fieldset">
+          <legend className="legend">Expense Management</legend>
+          {/* Expense Head text field*/}
+          <FormGroup>
+            <Label for="expense_head">Expense Head</Label>
+            <Input
+              type="text"
+              name="expense_head"
+              id="expense_head"
+              value={newExpense.expense_head}
+              onChange={handleChange}
+              invalid={!!errors.expense_head}
+              aria-label="Expense Head"
+            />
+            <FormFeedback>{errors.expense_head}</FormFeedback>
+          </FormGroup>
 
-        <FormGroup>
-          {/* Amount Text field with number validation */}
-          <Label for="amount">Amount</Label>
-          <Input
-            type="text"
-            name="amount"
-            id="amount"
-            value={newExpense.amount}
-            onChange={handleChange}
-            invalid={!!errors.amount}
-            aria-label="Amount"
-          />
-          <FormFeedback>{errors.amount}</FormFeedback>
-        </FormGroup>
+          <FormGroup>
+            {/* Amount Text field with number validation */}
+            <Label for="amount">Amount</Label>
+            <Input
+              type="text"
+              name="amount"
+              id="amount"
+              value={newExpense.amount}
+              onChange={handleChange}
+              invalid={!!errors.amount}
+              aria-label="Amount"
+            />
+            <FormFeedback>{errors.amount}</FormFeedback>
+          </FormGroup>
 
-        {/* Expense Category Dropdown */}
-        <FormGroup>
-          <Label for="categoryId">Category</Label>
-          <Input
-            type="select"
-            name="categoryId"
-            id="categoryId"
-            value={newExpense.categoryId}
-            onChange={handleChange}
-            invalid={!!errors.categoryId}
-            aria-label="Category"
-          >
-            <option value="">Select a category</option>
-            {categories.map((category) => (
-              <option key={category.id} value={category.id}>
-                {category.name}
-              </option>
-            ))}
-          </Input>
-          <FormFeedback>{errors.categoryId}</FormFeedback>
-        </FormGroup>
+          {/* Expense Category Dropdown */}
+          <FormGroup>
+            <Label for="categoryId">Category</Label>
+            <Input
+              type="select"
+              name="categoryId"
+              id="categoryId"
+              value={newExpense.categoryId}
+              onChange={handleChange}
+              invalid={!!errors.categoryId}
+              aria-label="Category"
+            >
+              <option value="">Select a category</option>
+              {categories.map((category) => (
+                <option key={category.id} value={category.id}>
+                  {category.name}
+                </option>
+              ))}
+            </Input>
+            <FormFeedback>{errors.categoryId}</FormFeedback>
+          </FormGroup>
 
-        {/* Expense category description text field */}
-        <FormGroup>
-          <Label for="description">Description</Label>
-          <Input
-            type="textarea"
-            name="description"
-            id="description"
-            value={newExpense.description}
-            onChange={handleChange}
-            aria-label="Description"
-          />
-        </FormGroup>
-        {/* Add expense and Cancel Buttons */}
-        <FormGroup>
-          <Button type="submit" color="primary" aria-label="Add Expense">
-            Add Expense
-          </Button>
-          <Button
-            type="button"
-            color="secondary"
-            onClick={handleCancel}
-            aria-label="Cancel"
-            style={{ marginLeft: "10px" }}
-          >
-            Cancel
-          </Button>
-        </FormGroup>
+          {/* Expense category description text field */}
+          <FormGroup>
+            <Label for="description">Description</Label>
+            <Input
+              type="textarea"
+              name="description"
+              id="description"
+              value={newExpense.description}
+              onChange={handleChange}
+              aria-label="Description"
+            />
+          </FormGroup>
+          {/* Add expense and Cancel Buttons */}
+          <FormGroup className="text-center form-btn">
+            <Button type="submit" color="primary" aria-label="Add Expense">
+              Add Expense
+            </Button>
+            <Button
+              type="button"
+              color="secondary"
+              onClick={handleCancel}
+              aria-label="Cancel"
+              style={{ marginLeft: "10px" }}
+            >
+              Cancel
+            </Button>
+          </FormGroup>
+        </fieldset>
       </Form>
 
       {/* <h3>Total Monthly Expenses: ${totalMonthlyExpenses.toFixed(2)}</h3> */}

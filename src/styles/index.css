@@ -18,6 +18,22 @@ main {
   margin: 0 auto;
 }
 
+/* Button styles */
+.form-btn button {
+  background: linear-gradient(90deg, #00b894, #0984e3);
+  color: #ffffff;
+  border: none;
+  padding: 10px 20px;
+  font-family: "Poppins", sans-serif;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.form-btn button:hover {
+  background: linear-gradient(90deg, #009e74, #0777d1);
+}
+
 /* Slide-down animation */
 .slide-down .modal-content {
   animation: slideDown 0.5s ease-in-out;
@@ -32,4 +48,12 @@ main {
     transform: translateY(0);
     opacity: 1;
   }
+}
+
+.model-header {
+  background-color: #00bf8f;
+}
+
+.model-header .dollar-icon {
+  color: white;
 }

@@ -38,6 +38,7 @@ export default function RentalRateCalculator() {
     year: "",
     expectedMonthlyRevenue: "",
     numberOfPods: "",
+    averageBooking: "",
     expectedOccupancyPercentage: "",
   });
 
@@ -74,6 +75,7 @@ export default function RentalRateCalculator() {
 
   // Function to calculate per booking expenses
   const calculatePerBookingExpenses = () => {
+    console.log("form data:", formData);
     const filteredExpenses = expenses.filter(
       (expense) => Number(expense.categoryId) === 12
     );
@@ -81,7 +83,8 @@ export default function RentalRateCalculator() {
       (sum, expense) => sum + expense.amount,
       0
     );
-    return parseFloat(totalExpenses.toFixed(2));
+    const expensesPerBookingPerMonth = totalExpenses * formData.averageBooking;
+    return parseFloat(expensesPerBookingPerMonth.toFixed(2));
   };
 
   // Function to calculate Rental rate
@@ -113,6 +116,8 @@ export default function RentalRateCalculator() {
       ).toFixed(2)
     );
 
+    console.log("Total Occupied Rooms Per Month: ", occupiedRoomsPerMonth);
+
     // Validate occupiedRoomsPerMonth
     if (occupiedRoomsPerMonth <= 0) {
       console.error("Occupied Rooms per Month should be greater than 0.");
@@ -128,23 +133,35 @@ export default function RentalRateCalculator() {
       (occupiedRoomsPerMonth * daysInMonth).toFixed(2)
     );
 
+    console.log("Total Occupied Room-Days", totalOccupiedRoomDays);
+
     const monthlyExpenses = calculateMonthlyExpenses();
+    const perBookingExpenses = calculatePerBookingExpenses();
+
+    const totalMonthlyExpenses = monthlyExpenses + perBookingExpenses;
+    console.log("Total Monthly Expenses", totalMonthlyExpenses);
+
     const totalExpensesPerOccupiedRoomDay = parseFloat(
-      (monthlyExpenses / totalOccupiedRoomDays).toFixed(2)
+      (totalMonthlyExpenses / totalOccupiedRoomDays).toFixed(2)
+    );
+    console.log(
+      "Total Expenses Per Occupied Room-Day",
+      totalExpensesPerOccupiedRoomDay
     );
 
     const revenuePerOccupiedRoomDay = parseFloat(
       (formData.expectedMonthlyRevenue / totalOccupiedRoomDays).toFixed(2)
     );
 
-    const expensesPerBooking = calculatePerBookingExpenses();
+    console.log("Revenue Per Occupied Room-Day", revenuePerOccupiedRoomDay);
 
     const expectedRentPerDayWithAllExpenses = parseFloat(
-      (
-        totalExpensesPerOccupiedRoomDay +
-        revenuePerOccupiedRoomDay +
-        expensesPerBooking
-      ).toFixed(2)
+      (totalExpensesPerOccupiedRoomDay + revenuePerOccupiedRoomDay).toFixed(2)
+    );
+
+    console.log(
+      "Expected Per Day Room Rent Including Expenses",
+      expectedRentPerDayWithAllExpenses
     );
 
     const commissionRate = parseFloat(commission[0].commission_rate).toFixed(2);
@@ -153,10 +170,12 @@ export default function RentalRateCalculator() {
       console.error("Commission rate should be greater than 0.");
       return;
     }
-
+    console.log("commissionrate: ", commissionRate);
     const franchiserCommission = parseFloat(
-      (expectedRentPerDayWithAllExpenses / commissionRate).toFixed(2)
+      (expectedRentPerDayWithAllExpenses * (commissionRate / 100)).toFixed(2)
     );
+
+    console.log("Franchiser commission: ", franchiserCommission);
 
     const expectedRentPerDayWithAllExpensesAndCommission = parseFloat(
       (expectedRentPerDayWithAllExpenses + franchiserCommission).toFixed(2)
@@ -200,6 +219,15 @@ export default function RentalRateCalculator() {
         "Please enter a valid integer for the number of pods.";
     }
 
+    // Average booking per month: must be a valid integer
+    if (
+      !Number.isInteger(Number(formData.averageBooking)) ||
+      formData.averageBooking <= 0
+    ) {
+      formErrors.averageBooking =
+        "Please enter a valid integer for the average number of booking per month.";
+    }
+
     // Expected Occupancy Percentage: must be a number between 0 and 100
     if (
       isNaN(formData.expectedOccupancyPercentage) ||
@@ -236,136 +264,157 @@ export default function RentalRateCalculator() {
   const toggleModal = () => setModalOpen(!modalOpen);
 
   return (
-    <Container className="form-container ">
+    <Container className="form-container">
       <Form onSubmit={handleSubmit} aria-label="Calculate Rental Rate Form">
-        <div className="form-row">
-          {/* Month Dropdown */}
-          <FormGroup>
-            <Label for="month">Month</Label>
-            <Input
-              type="select"
-              id="month"
-              name="month"
-              value={formData.month}
-              onChange={handleChange}
-              aria-required="true"
-              aria-label="Month"
-            >
-              <option value="">Select Month</option>
-              <option value="1">January</option>
-              <option value="2">February</option>
-              <option value="3">March</option>
-              <option value="4">April</option>
-              <option value="5">May</option>
-              <option value="6">June</option>
-              <option value="7">July</option>
-              <option value="8">August</option>
-              <option value="9">September</option>
-              <option value="10">October</option>
-              <option value="11">November</option>
-              <option value="12">December</option>
-            </Input>
-            {/* <FormText>
+        <fieldset className="my-fieldset">
+          <legend className="legend">Rental Calculator</legend>
+          <div className="form-row">
+            {/* Month Dropdown */}
+            <FormGroup>
+              <Label for="month">Month</Label>
+              <Input
+                type="select"
+                id="month"
+                name="month"
+                value={formData.month}
+                onChange={handleChange}
+                aria-required="true"
+                aria-label="Month"
+              >
+                <option value="">Select Month</option>
+                <option value="1">January</option>
+                <option value="2">February</option>
+                <option value="3">March</option>
+                <option value="4">April</option>
+                <option value="5">May</option>
+                <option value="6">June</option>
+                <option value="7">July</option>
+                <option value="8">August</option>
+                <option value="9">September</option>
+                <option value="10">October</option>
+                <option value="11">November</option>
+                <option value="12">December</option>
+              </Input>
+              {/* <FormText>
               The month for which the rental rate is being calculated.
             </FormText> */}
-          </FormGroup>
+            </FormGroup>
 
-          {/* Year with Validation */}
-          <FormGroup>
-            <Label for="year">Year</Label>
-            <Input
-              type="text"
-              id="year"
-              name="year"
-              value={formData.year}
-              onChange={handleChange}
-              invalid={!!errors.year}
-              aria-required="true"
-              aria-label="year-description"
-            />
-            <FormFeedback>{errors.year}</FormFeedback>
-            {/* <FormText>
+            {/* Year with Validation */}
+            <FormGroup>
+              <Label for="year">Year</Label>
+              <Input
+                type="text"
+                id="year"
+                name="year"
+                value={formData.year}
+                onChange={handleChange}
+                invalid={!!errors.year}
+                aria-required="true"
+                aria-label="year-description"
+              />
+              <FormFeedback>{errors.year}</FormFeedback>
+              {/* <FormText>
               The year for which the rental rate is being calculated.
             </FormText> */}
+            </FormGroup>
+          </div>
+
+          {/* Expected Monthly Revenue with Validation */}
+          <FormGroup>
+            <Label for="expectedMonthlyRevenue">Expected Monthly Revenue</Label>
+            <Input
+              type="text"
+              id="expectedMonthlyRevenue"
+              name="expectedMonthlyRevenue"
+              value={formData.expectedMonthlyRevenue}
+              onChange={handleChange}
+              invalid={!!errors.expectedMonthlyRevenue}
+              aria-required="true"
+              aria-label="expectedMonthlyRevenue"
+            />
+            <FormFeedback>{errors.expectedMonthlyRevenue}</FormFeedback>
+            <FormText>The desired revenue to achieve in a month.</FormText>
           </FormGroup>
-        </div>
 
-        {/* Expected Monthly Revenue with Validation */}
-        <FormGroup>
-          <Label for="expectedMonthlyRevenue">Expected Monthly Revenue</Label>
-          <Input
-            type="text"
-            id="expectedMonthlyRevenue"
-            name="expectedMonthlyRevenue"
-            value={formData.expectedMonthlyRevenue}
-            onChange={handleChange}
-            invalid={!!errors.expectedMonthlyRevenue}
-            aria-required="true"
-            aria-label="expectedMonthlyRevenue"
-          />
-          <FormFeedback>{errors.expectedMonthlyRevenue}</FormFeedback>
-          <FormText>The desired revenue to achieve in a month.</FormText>
-        </FormGroup>
+          {/* Number of Pods with Validation */}
+          <FormGroup>
+            <Label for="numberOfPods">Number of Pods</Label>
+            <Input
+              type="text"
+              id="numberOfPods"
+              name="numberOfPods"
+              value={formData.numberOfPods}
+              onChange={handleChange}
+              invalid={!!errors.numberOfPods}
+              aria-required="true"
+              aria-label="Number of Pods"
+            />
+            <FormFeedback>{errors.numberOfPods}</FormFeedback>
+            <FormText>
+              The total number of rental pods available for booking.
+            </FormText>
+          </FormGroup>
 
-        {/* Number of Pods with Validation */}
-        <FormGroup>
-          <Label for="numberOfPods">Number of Pods</Label>
-          <Input
-            type="text"
-            id="numberOfPods"
-            name="numberOfPods"
-            value={formData.numberOfPods}
-            onChange={handleChange}
-            invalid={!!errors.numberOfPods}
-            aria-required="true"
-            aria-label="Number of Pods"
-          />
-          <FormFeedback>{errors.numberOfPods}</FormFeedback>
-          <FormText>
-            The total number of rental pods available for booking.
-          </FormText>
-        </FormGroup>
+          {/* Average number of booking per month with Validation */}
+          <FormGroup>
+            <Label for="averageBooking">
+              Average Number of booking per month
+            </Label>
+            <Input
+              type="text"
+              id="averageBooking"
+              name="averageBooking"
+              value={formData.averageBooking}
+              onChange={handleChange}
+              invalid={!!errors.averageBooking}
+              aria-required="true"
+              aria-label="Average number of booking per month"
+            />
+            <FormFeedback>{errors.averageBooking}</FormFeedback>
+          </FormGroup>
 
-        {/* Expected Occupancy Percentage with Validation */}
-        <FormGroup>
-          <Label for="expectedOccupancyPercentage">
-            Expected Occupancy Percentage
-          </Label>
-          <Input
-            type="text"
-            id="expectedOccupancyPercentage"
-            name="expectedOccupancyPercentage"
-            value={formData.expectedOccupancyPercentage}
-            onChange={handleChange}
-            invalid={!!errors.expectedOccupancyPercentage}
-            aria-required="true"
-            aria-label="expected Occupancy Percentage"
-          />
-          <FormFeedback>{errors.expectedOccupancyPercentage}</FormFeedback>
-          <FormText>
-            The percentage of time the pods are expected to be occupied.
-          </FormText>
-        </FormGroup>
+          {/* Expected Occupancy Percentage with Validation */}
+          <FormGroup>
+            <Label for="expectedOccupancyPercentage">
+              Expected Occupancy Percentage
+            </Label>
+            <Input
+              type="text"
+              id="expectedOccupancyPercentage"
+              name="expectedOccupancyPercentage"
+              value={formData.expectedOccupancyPercentage}
+              onChange={handleChange}
+              invalid={!!errors.expectedOccupancyPercentage}
+              aria-required="true"
+              aria-label="expected Occupancy Percentage"
+            />
+            <FormFeedback>{errors.expectedOccupancyPercentage}</FormFeedback>
+            <FormText>
+              The percentage of time the pods are expected to be occupied.
+            </FormText>
+          </FormGroup>
 
-        {/* Submit and Cancel Buttons */}
-        <FormGroup>
-          <Button
-            type="submit"
-            color="primary"
-            aria-label="Calculate Room Rent"
-          >
-            Calculate
-          </Button>
-          <Button
-            type="button"
-            color="secondary"
-            onClick={handleCancel}
-            aria-label="Cancel"
-            style={{ marginLeft: "10px" }}
-          >
-            Cancel
-          </Button>
-        </FormGroup>
+          {/* Submit and Cancel Buttons */}
+          <FormGroup className="text-center form-btn">
+            <Button
+              type="submit"
+              color="primary"
+              aria-label="Calculate Room Rent"
+            >
+              Calculate
+            </Button>
+            <Button
+              type="button"
+              color="secondary"
+              onClick={handleCancel}
+              aria-label="Cancel"
+              style={{ marginLeft: "10px" }}
+            >
+              Cancel
+            </Button>
+          </FormGroup>
+        </fieldset>
       </Form>
       {rentalRate !== null && (
         <RentalRateDisplay

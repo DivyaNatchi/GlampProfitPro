@@ -2,13 +2,24 @@
 .form-container {
   background-color: #ffffff;
   padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e0e0e0;
-  width: 500px; /* Set a fixed width for the form on large screens */
-  max-width: 100%; /* Ensure form width is 100% on smaller screens */
   margin: 0 15px; /* Small margin on mobile devices */
+  width: 500px; /* Set a fixed width for the form on large screens */
+}
+
+.legend {
+  font-size: 1.1rem;
+  padding: 0 3px;
+  float: none;
+  width: auto;
+}
+
+.my-fieldset {
+  border: 1px solid #dadada;
+  padding: 20px;
+  border-radius: 10px;
+  max-width: 100%; /* Ensure form width is 100% on smaller screens */
   box-sizing: border-box; /* Include padding in width calculations */
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 /* Typography */
@@ -48,7 +59,7 @@ select {
 
 input[type="text"]:focus,
 select:focus {
-  border-color: #17a2b8;
+  border-color: #00bf8f;
   outline: none;
 }
 
@@ -63,8 +74,7 @@ select:focus {
   width: 48%;
 }
 
-/* Button styles */
-button[type="submit"] {
+/* button[type="submit"] {
   background: linear-gradient(90deg, #00b894, #0984e3);
   color: #ffffff;
   border: none;
@@ -93,7 +103,7 @@ button[type="button"] {
 
 button[type="button"]:hover {
   background-color: #b2bec3;
-}
+} */
 
 /* Responsive layout for mobile devices */
 @media (max-width: 768px) {
@@ -110,6 +120,10 @@ button[type="button"]:hover {
   .form-container {
     padding: 20px;
   }
+
+  .legend {
+    font-size: 1rem;
+  }
 }
 
 /* Adjust spacing for mobile */
@@ -123,5 +137,8 @@ button[type="button"]:hover {
 @media (max-width: 480px) {
   .form-container {
     padding: 10px;
+  }
+  .legend {
+    font-size: 0.9rem;
   }
 }

@@ -111,67 +111,68 @@ export default function ExpenseCategoryManagement() {
   };
 
   return (
-    <Container
-      className="form-container "
-      aria-labelledby="expense-category-management"
-    >
-      <h2 id="expense-category-management">Manage Expense Categories</h2>
+    <Container className="form-container">
       <Form
         onSubmit={handleSubmit}
         aria-live="polite"
-        aria-describedby="form-description"
+        aria-label="Expense Category Management"
       >
-        <p id="form-description">
-          Please select a category and enter the monthly conversion constant.
-        </p>
+        <fieldset className="my-fieldset">
+          <legend className="legend">Expense Category Management</legend>
+          <p id="form-description">
+            Please select a category and enter the monthly conversion constant.
+          </p>
+          {/* Category Dropdown */}
+          <FormGroup>
+            <Label for="categorySelect">Select Category</Label>
+            <Input
+              type="select"
+              name="categorySelect"
+              id="categorySelect"
+              value={selectedCategory}
+              aria-label="Select Category"
+              aria-required="true"
+              onChange={(e) => setSelectedCategory(e.target.value)}
+            >
+              <option value="">Select a Category</option>
+              {categoryOptions.map((category) => (
+                <option key={category.id} value={category.id}>
+                  {category.name} - {category.description}
+                </option>
+              ))}
+            </Input>
+          </FormGroup>
 
-        {/* Category Dropdown */}
-        <FormGroup>
-          <Label for="categorySelect">Select Category</Label>
-          <Input
-            type="select"
-            name="categorySelect"
-            id="categorySelect"
-            value={selectedCategory}
-            aria-label="Select Category"
-            aria-required="true"
-            onChange={(e) => setSelectedCategory(e.target.value)}
-          >
-            <option value="">Select a Category</option>
-            {categoryOptions.map((category) => (
-              <option key={category.id} value={category.id}>
-                {category.name} - {category.description}
-              </option>
-            ))}
-          </Input>
-        </FormGroup>
+          {/* Monthly Conversion Constant */}
+          <FormGroup>
+            <Label for="monthlyConstant">Monthly Conversion Constant</Label>
+            <Input
+              type="text"
+              name="monthlyConstant"
+              id="monthlyConstant"
+              value={monthlyConstant}
+              aria-label="Monthly Conversion Constant"
+              aria-required="true"
+              onChange={(e) => setMonthlyConstant(e.target.value)}
+              invalid={!!errors}
+            />
+            {errors && <FormFeedback>{errors}</FormFeedback>}
+          </FormGroup>
 
-        {/* Monthly Conversion Constant */}
-        <FormGroup>
-          <Label for="monthlyConstant">Monthly Conversion Constant</Label>
-          <Input
-            type="text"
-            name="monthlyConstant"
-            id="monthlyConstant"
-            placeholder="Enter Monthly Conversion Constant"
-            value={monthlyConstant}
-            aria-label="Monthly Conversion Constant"
-            aria-required="true"
-            onChange={(e) => setMonthlyConstant(e.target.value)}
-            invalid={!!errors}
-          />
-          {errors && <FormFeedback>{errors}</FormFeedback>}
-        </FormGroup>
-
-        {/* Save and Cancel Buttons */}
-        <FormGroup>
-          <Button type="submit" color="primary" aria-label="Save Category">
-            Save
-          </Button>{" "}
-          <Button color="secondary" onClick={handleCancel} aria-label="Cancel">
-            Cancel
-          </Button>
-        </FormGroup>
+          {/* Save and Cancel Buttons */}
+          <FormGroup className="text-center form-btn">
+            <Button type="submit" color="primary" aria-label="Save Category">
+              Save
+            </Button>{" "}
+            <Button
+              color="secondary"
+              onClick={handleCancel}
+              aria-label="Cancel"
+            >
+              Cancel
+            </Button>
+          </FormGroup>
+        </fieldset>
       </Form>
     </Container>
   );

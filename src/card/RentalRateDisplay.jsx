@@ -13,18 +13,12 @@ export default function RentalRateDisplayModal(props) {
       size="lg"
       className="slide-down"
     >
-      <ModalHeader toggle={toggle}>
-        <FaDollarSign size={30} />
+      <ModalHeader toggle={toggle} className="model-header">
+        <FaDollarSign size={30} className="dollar-icon" />
       </ModalHeader>
-      <ModalBody
-        className="text-center"
-        style={{
-          background: "linear-gradient(135deg, #f7941d, #f94d6a)",
-          color: "white",
-        }}
-      >
+      <ModalBody className="text-center form-btn">
         <h1 className="display-3">${rentalRate.toFixed(2)}</h1>
-        <Button color="light" onClick={toggle} className="mt-3">
+        <Button onClick={toggle} className="mt-3">
           Close
         </Button>
       </ModalBody>
