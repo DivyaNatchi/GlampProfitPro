@@ -6,19 +6,13 @@ export default function RentalRateDisplayModal(props) {
   const { rentalRate, isOpen, toggle } = props; // `isOpen` controls modal visibility, `toggle` closes it
 
   return (
-    <Modal
-      isOpen={isOpen}
-      toggle={toggle}
-      centered
-      size="lg"
-      className="slide-down"
-    >
+    <Modal isOpen={isOpen} toggle={toggle} centered size="md">
       <ModalHeader toggle={toggle} className="model-header">
-        <FaDollarSign size={30} className="dollar-icon" />
+        <FaDollarSign size={30} />
       </ModalHeader>
-      <ModalBody className="text-center form-btn">
+      <ModalBody className="text-center">
         <h1 className="display-3">${rentalRate.toFixed(2)}</h1>
-        <Button onClick={toggle} className="mt-3">
+        <Button onClick={toggle} className="mt-3 custom-button">
           Close
         </Button>
       </ModalBody>

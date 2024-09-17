@@ -395,18 +395,18 @@ export default function RentalRateCalculator() {
           </FormGroup>
 
           {/* Submit and Cancel Buttons */}
-          <FormGroup className="text-center form-btn">
+          <FormGroup className="text-center">
             <Button
               type="submit"
-              color="primary"
               aria-label="Calculate Room Rent"
+              className="custom-button"
             >
               Calculate
             </Button>
             <Button
               type="button"
-              color="secondary"
               onClick={handleCancel}
+              className="custom-button"
               aria-label="Cancel"
               style={{ marginLeft: "10px" }}
             >

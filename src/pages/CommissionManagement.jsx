@@ -98,10 +98,10 @@ export default function CommissionManagement() {
               <FormFeedback id="commission-rate-error">{errors}</FormFeedback>
             )}
           </FormGroup>
-          <FormGroup className="text-center form-btn">
+          <FormGroup className="text-center">
             <Button
               type="submit"
-              color="primary"
+              className="custom-button "
               aria-label="Save Commission Rate"
             >
               Save

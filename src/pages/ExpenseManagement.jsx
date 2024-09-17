@@ -20,7 +20,7 @@ import "../styles/form.css";
 import "../styles/table.css";
 import * as XLSX from "node-xlsx"; // Import node-xlsx for Excel operations
 import FileSaver from "file-saver"; // To save files in browser
-import { FaFileDownload } from "react-icons/fa";
+import { FaFileDownload, FaEdit, FaTrash } from "react-icons/fa";
 
 // Loader function to fetch expenses from IndexedDB expenses table
 export const expenseLoader = async () => {
@@ -54,8 +54,9 @@ export default function ExpenseManagement() {
     description: "",
   });
   const [data, SetData] = useState([]);
+  const [editMode, setEditMode] = useState(false); // New state to track edit mode
+  const [editExpenseId, setEditExpenseId] = useState(null); // Store the id of the expense being edited
   const [errors, setErrors] = useState({});
-  // Modal state to show when a category constant is missing
   const [modal, setModal] = useState(false);
   const [missingCategories, setMissingCategories] = useState([]);
 
@@ -105,8 +106,15 @@ export default function ExpenseManagement() {
         last_updated: new Date().toLocaleDateString(),
       };
 
-      // Save the new expense to IndexedDB
-      await db.expenses.add(newExpenseEntry);
+      if (editMode) {
+        // Update the existing expense in IndexedDB
+        await db.expenses.update(editExpenseId, newExpenseEntry);
+        setEditMode(false);
+        setEditExpenseId(null);
+      } else {
+        // Save the new expense to IndexedDB
+        await db.expenses.add(newExpenseEntry);
+      }
 
       // Fetch updated expenses from IndexedDB and update the state
       const updatedExpenses = await db.expenses.toArray();
@@ -130,7 +138,28 @@ export default function ExpenseManagement() {
       categoryId: "",
       description: "",
     });
+    setEditMode(false); // Set edit mode
     setErrors({});
+  };
+
+  const handleEdit = (expense) => {
+    setNewExpense({
+      expense_head: expense.expense_head,
+      amount: expense.amount,
+      categoryId: expense.categoryId,
+      description: expense.description,
+    });
+    setEditMode(true); // Set edit mode
+    setEditExpenseId(expense.id); // Store the id of the expense being edited
+  };
+
+  const handleDelete = async (expenseId) => {
+    // Remove the expense from IndexedDB
+    await db.expenses.delete(expenseId);
+
+    // Fetch updated expenses from IndexedDB and update the state
+    const updatedExpenses = await db.expenses.toArray();
+    setExpenses(updatedExpenses);
   };
 
   // Prepare date to export in excel and display in table
@@ -283,15 +312,19 @@ export default function ExpenseManagement() {
             </FormGroup>
 
             {/* Add expense and Cancel Buttons */}
-            <FormGroup className="text-center form-btn">
-              <Button type="submit" color="primary" aria-label="Add Expense">
-                Add Expense
+            <FormGroup className="text-center">
+              <Button
+                type="submit"
+                aria-label="Add Expense"
+                className="custom-button"
+              >
+                {editMode ? "Edit Expenses" : "Add Expense"}
               </Button>
               <Button
                 type="button"
-                color="secondary"
                 onClick={handleCancel}
                 aria-label="Cancel"
+                className="custom-button"
                 style={{ marginLeft: "10px" }}
               >
                 Cancel
@@ -306,9 +339,8 @@ export default function ExpenseManagement() {
           <Table hover responsive aria-label="Expense Table">
             <thead>
               <tr>
-                <th colSpan="4" className="text-center monthly-expense-header">
+                <th colSpan="5" className="text-center monthly-expense-header">
                   Monthly Expenses
-                  {/* Download icon */}
                   <FaFileDownload
                     size={20}
                     onClick={handleDownloadExcel}
@@ -322,23 +354,53 @@ export default function ExpenseManagement() {
                 <th>Amount</th>
                 <th>Category</th>
                 <th>Monthly Amount</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
-              {data.map((row, index) => (
-                <tr key={index + 1}>
-                  {row.map((element) => (
-                    <td>{element || "N/A"}</td>
-                  ))}
+              {expenses.map((expense) => (
+                <tr key={expense.id}>
+                  <td>{expense.expense_head}</td>
+                  <td>{expense.amount}</td>
+                  <td>
+                    {categories.find(
+                      (cat) => cat.id === Number(expense.categoryId)
+                    )?.name || "N/A"}
+                  </td>
+                  <td>
+                    {categoryConstants.find(
+                      (categoryConstant) =>
+                        categoryConstant.categoryId ===
+                        Number(expense.categoryId)
+                    )?.monthly_conversion_constant * expense.amount || "N/A"}
+                  </td>
+                  <td>
+                    <FaEdit
+                      style={{
+                        cursor: "pointer",
+                        marginRight: "20px",
+                      }}
+                      onClick={() => handleEdit(expense)}
+                      aria-label="Edit Expense"
+                    />
+                    <FaTrash
+                      style={{
+                        cursor: "pointer",
+                        marginLeft: "10px",
+                        color: "red",
+                      }}
+                      onClick={() => handleDelete(expense.id)}
+                      aria-label="Delete Expense"
+                    />
+                  </td>
                 </tr>
               ))}
             </tbody>
           </Table>
         </Container>
       )}
-
-      <Modal isOpen={modal} toggle={() => setModal(false)}>
-        <ModalHeader toggle={() => setModal(false)}>
+      <Modal isOpen={modal} toggle={() => setModal(false)} centered size="md">
+        <ModalHeader toggle={() => setModal(false)} className="model-header">
           Missing Category Constants
         </ModalHeader>
         <ModalBody>
@@ -352,12 +414,15 @@ export default function ExpenseManagement() {
             ))}
           </ul>
           <p>Please contact the franchisor.</p>
+          <div className="text-center">
+            <Button
+              onClick={() => setModal(false)}
+              className="mt-3 custom-button"
+            >
+              OK
+            </Button>
+          </div>
         </ModalBody>
-        <ModalFooter>
-          <Button color="primary" onClick={() => setModal(false)}>
-            OK
-          </Button>
-        </ModalFooter>
       </Modal>
     </>
   );

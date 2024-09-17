@@ -165,14 +165,19 @@ export default function ExpenseCategoryManagement() {
           </FormGroup>
 
           {/* Save and Cancel Buttons */}
-          <FormGroup className="text-center form-btn">
-            <Button type="submit" color="primary" aria-label="Save Category">
-              Save
-            </Button>{" "}
+          <FormGroup className="text-center ">
             <Button
-              color="secondary"
+              type="submit"
+              aria-label="Save Category"
+              className="custom-button "
+            >
+              Save
+            </Button>
+            <Button
               onClick={handleCancel}
               aria-label="Cancel"
+              className="custom-button"
+              style={{ marginLeft: "10px" }}
             >
               Cancel
             </Button>
