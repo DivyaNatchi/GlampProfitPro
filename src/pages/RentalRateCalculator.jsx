@@ -44,10 +44,6 @@ export default function RentalRateCalculator() {
 
   const [errors, setErrors] = useState({});
 
-  const handleCloseRateDisplay = () => {
-    setRentalRate(null); // Close the rental rate display and go back to the calculator
-  };
-
   // Function to calculate total monthly expenses
   const calculateMonthlyExpenses = () => {
     let totalMonthlyExpenses = 0;
@@ -66,16 +62,16 @@ export default function RentalRateCalculator() {
       totalMonthlyExpenses += expense.amount * multiplier;
     });
 
-    console.log(
-      "Total monthly expenses calculated:",
-      totalMonthlyExpenses.toFixed(2)
-    );
+    // console.log(
+    //   "Total monthly expenses calculated:",
+    //   totalMonthlyExpenses.toFixed(2)
+    // );
     return parseFloat(totalMonthlyExpenses.toFixed(2));
   };
 
   // Function to calculate per booking expenses
   const calculatePerBookingExpenses = () => {
-    console.log("form data:", formData);
+    // console.log("form data:", formData);
     const filteredExpenses = expenses.filter(
       (expense) => Number(expense.categoryId) === 12
     );
@@ -89,8 +85,8 @@ export default function RentalRateCalculator() {
 
   // Function to calculate Rental rate
   const calculateRentalRate = (formData) => {
-    console.log("From rental rate calculation");
-    console.log(formData);
+    // console.log("From rental rate calculation");
+    // console.log(formData);
 
     // Validate numberOfPods and expectedOccupancyPercentage
     if (formData.numberOfPods <= 0) {
@@ -116,7 +112,7 @@ export default function RentalRateCalculator() {
       ).toFixed(2)
     );
 
-    console.log("Total Occupied Rooms Per Month: ", occupiedRoomsPerMonth);
+    // console.log("Total Occupied Rooms Per Month: ", occupiedRoomsPerMonth);
 
     // Validate occupiedRoomsPerMonth
     if (occupiedRoomsPerMonth <= 0) {
@@ -126,43 +122,43 @@ export default function RentalRateCalculator() {
 
     // Get the number of days in the month based on user input (month and year)
     const daysInMonth = new Date(formData.year, formData.month, 0).getDate();
-    console.log("Days in month: ", daysInMonth);
+    // console.log("Days in month: ", daysInMonth);
 
     // Calculate total occupied room-days using the number of days in the month
     const totalOccupiedRoomDays = parseFloat(
       (occupiedRoomsPerMonth * daysInMonth).toFixed(2)
     );
 
-    console.log("Total Occupied Room-Days", totalOccupiedRoomDays);
+    // console.log("Total Occupied Room-Days", totalOccupiedRoomDays);
 
     const monthlyExpenses = calculateMonthlyExpenses();
     const perBookingExpenses = calculatePerBookingExpenses();
 
     const totalMonthlyExpenses = monthlyExpenses + perBookingExpenses;
-    console.log("Total Monthly Expenses", totalMonthlyExpenses);
+    // console.log("Total Monthly Expenses", totalMonthlyExpenses);
 
     const totalExpensesPerOccupiedRoomDay = parseFloat(
       (totalMonthlyExpenses / totalOccupiedRoomDays).toFixed(2)
     );
-    console.log(
-      "Total Expenses Per Occupied Room-Day",
-      totalExpensesPerOccupiedRoomDay
-    );
+    // console.log(
+    //   "Total Expenses Per Occupied Room-Day",
+    //   totalExpensesPerOccupiedRoomDay
+    // );
 
     const revenuePerOccupiedRoomDay = parseFloat(
       (formData.expectedMonthlyRevenue / totalOccupiedRoomDays).toFixed(2)
     );
 
-    console.log("Revenue Per Occupied Room-Day", revenuePerOccupiedRoomDay);
+    // console.log("Revenue Per Occupied Room-Day", revenuePerOccupiedRoomDay);
 
     const expectedRentPerDayWithAllExpenses = parseFloat(
       (totalExpensesPerOccupiedRoomDay + revenuePerOccupiedRoomDay).toFixed(2)
     );
 
-    console.log(
-      "Expected Per Day Room Rent Including Expenses",
-      expectedRentPerDayWithAllExpenses
-    );
+    // console.log(
+    //   "Expected Per Day Room Rent Including Expenses",
+    //   expectedRentPerDayWithAllExpenses
+    // );
 
     const commissionRate = parseFloat(commission[0].commission_rate).toFixed(2);
     // Validate commissionRate to avoid division by zero
@@ -170,12 +166,12 @@ export default function RentalRateCalculator() {
       console.error("Commission rate should be greater than 0.");
       return;
     }
-    console.log("commissionrate: ", commissionRate);
+    // console.log("commissionrate: ", commissionRate);
     const franchiserCommission = parseFloat(
       (expectedRentPerDayWithAllExpenses * (commissionRate / 100)).toFixed(2)
     );
 
-    console.log("Franchiser commission: ", franchiserCommission);
+    // console.log("Franchiser commission: ", franchiserCommission);
 
     const expectedRentPerDayWithAllExpensesAndCommission = parseFloat(
       (expectedRentPerDayWithAllExpenses + franchiserCommission).toFixed(2)
@@ -315,8 +311,8 @@ export default function RentalRateCalculator() {
               />
               <FormFeedback>{errors.year}</FormFeedback>
               {/* <FormText>
-              The year for which the rental rate is being calculated.
-            </FormText> */}
+                The year for which the rental rate is being calculated.
+              </FormText> */}
             </FormGroup>
           </div>
 
@@ -371,6 +367,9 @@ export default function RentalRateCalculator() {
               aria-required="true"
               aria-label="Average number of booking per month"
             />
+            <FormText>
+              The total number of booking in a month for all the pods.
+            </FormText>
             <FormFeedback>{errors.averageBooking}</FormFeedback>
           </FormGroup>
 

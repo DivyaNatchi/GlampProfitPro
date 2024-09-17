@@ -3,6 +3,7 @@ import { useLoaderData } from "react-router-dom";
 import {
   Form,
   FormGroup,
+  FormText,
   Label,
   Input,
   Button,
@@ -119,9 +120,6 @@ export default function ExpenseCategoryManagement() {
       >
         <fieldset className="my-fieldset">
           <legend className="legend">Expense Category Management</legend>
-          <p id="form-description">
-            Please select a category and enter the monthly conversion constant.
-          </p>
           {/* Category Dropdown */}
           <FormGroup>
             <Label for="categorySelect">Select Category</Label>
@@ -141,6 +139,9 @@ export default function ExpenseCategoryManagement() {
                 </option>
               ))}
             </Input>
+            <FormText>
+              Choose an appropriate expense category from the dropdown.
+            </FormText>
           </FormGroup>
 
           {/* Monthly Conversion Constant */}
@@ -156,6 +157,10 @@ export default function ExpenseCategoryManagement() {
               onChange={(e) => setMonthlyConstant(e.target.value)}
               invalid={!!errors}
             />
+            <FormText>
+              Enter a numerical constant to normalize the expense to a monthly
+              rate.
+            </FormText>
             {errors && <FormFeedback>{errors}</FormFeedback>}
           </FormGroup>
 

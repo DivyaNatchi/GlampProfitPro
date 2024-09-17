@@ -1,0 +1,30 @@
+/* Table header styling */
+thead th {
+  /* background-color: #00bf8f !important; */
+  color: #007b5e !important;
+  font-weight: bold;
+  padding: 12px !important;
+  text-align: left;
+}
+
+/* Monthly Expenses Header styling (if applicable) */
+thead th.monthly-expense-header {
+  background-color: #007b5e !important; /* Different color for Monthly Expense header */
+  color: white !important;
+}
+
+/* Table row content styling */
+tbody td {
+  border-bottom: 1px solid #ddd;
+}
+
+/* Additional styling for row alternation (optional) */
+/* tbody tr:nth-child(even) {
+  background-color: #f2f2f2;
+} */
+
+table,
+th,
+td {
+  border: 1px solid #ddd;
+}

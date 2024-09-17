@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import {
   Form,
   FormGroup,
+  FormText,
   Label,
   Input,
   Button,
@@ -81,7 +82,7 @@ export default function CommissionManagement() {
         <fieldset className="my-fieldset">
           <legend className="legend">Commission Management</legend>
           <FormGroup>
-            <Label for="commission_rate">Commission Rate (%)</Label>
+            <Label for="commission_rate">Commission Rate</Label>
             <Input
               type="text"
               name="commission_rate"
@@ -91,7 +92,8 @@ export default function CommissionManagement() {
               invalid={!!errors}
               aria-label="Commission Rate Input"
               aria-describedby="commission-rate-error"
-            />
+            ></Input>
+            <FormText>Enter the commission rate as a percentage (%)</FormText>
             {errors && (
               <FormFeedback id="commission-rate-error">{errors}</FormFeedback>
             )}
