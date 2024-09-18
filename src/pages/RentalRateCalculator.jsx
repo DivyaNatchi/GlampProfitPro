@@ -191,7 +191,13 @@ export default function RentalRateCalculator() {
   };
 
   const validateForm = () => {
+    console.log("Form data:", formData);
     let formErrors = {};
+
+    // Month validation: must select a valid month (not empty)
+    if (!formData.month || formData.month === "") {
+      formErrors.month = "Please select a valid month.";
+    }
     // Year validation: must be a valid 4-digit number
     if (!/^\d{4}$/.test(formData.year)) {
       formErrors.year = "Please enter a valid 4-digit year.";
@@ -224,16 +230,17 @@ export default function RentalRateCalculator() {
         "Please enter a valid integer for the average number of booking per month.";
     }
 
-    // Expected Occupancy Percentage: must be a number between 0 and 100
+    // Expected Occupancy Percentage: must be a valid number between 0 and 100
     if (
-      isNaN(formData.expectedOccupancyPercentage) ||
+      formData.expectedOccupancyPercentage === "" || // Check for empty string
+      isNaN(Number(formData.expectedOccupancyPercentage)) || // Check if it's a number
       formData.expectedOccupancyPercentage < 0 ||
       formData.expectedOccupancyPercentage > 100
     ) {
       formErrors.expectedOccupancyPercentage =
         "Please enter a percentage between 0 and 100.";
     }
-
+    console.log("formerror:", formErrors);
     setErrors(formErrors);
     return Object.keys(formErrors).length === 0;
   };
@@ -251,13 +258,25 @@ export default function RentalRateCalculator() {
       year: "",
       expectedMonthlyRevenue: "",
       numberOfPods: "",
+      averageBooking: "",
       expectedOccupancyPercentage: "",
     });
     setErrors({});
   };
 
   // Toggle the modal visibility
-  const toggleModal = () => setModalOpen(!modalOpen);
+  const toggleModal = () => {
+    setFormData({
+      month: "",
+      year: "",
+      expectedMonthlyRevenue: "",
+      numberOfPods: "",
+      averageBooking: "",
+      expectedOccupancyPercentage: "",
+    });
+    setErrors({});
+    setModalOpen(!modalOpen);
+  };
 
   return (
     <Container className="form-container">
@@ -274,6 +293,7 @@ export default function RentalRateCalculator() {
                 name="month"
                 value={formData.month}
                 onChange={handleChange}
+                invalid={!!errors.month}
                 aria-required="true"
                 aria-label="Month"
               >
@@ -291,6 +311,7 @@ export default function RentalRateCalculator() {
                 <option value="11">November</option>
                 <option value="12">December</option>
               </Input>
+              <FormFeedback>{errors.month}</FormFeedback>
               {/* <FormText>
               The month for which the rental rate is being calculated.
             </FormText> */}

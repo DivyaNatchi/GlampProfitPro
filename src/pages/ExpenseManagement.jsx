@@ -21,6 +21,8 @@ import "../styles/table.css";
 import * as XLSX from "node-xlsx"; // Import node-xlsx for Excel operations
 import FileSaver from "file-saver"; // To save files in browser
 import { FaFileDownload, FaEdit, FaTrash } from "react-icons/fa";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 // Loader function to fetch expenses from IndexedDB expenses table
 export const expenseLoader = async () => {
@@ -53,7 +55,6 @@ export default function ExpenseManagement() {
     categoryId: "",
     description: "",
   });
-  const [data, SetData] = useState([]);
   const [editMode, setEditMode] = useState(false); // New state to track edit mode
   const [editExpenseId, setEditExpenseId] = useState(null); // Store the id of the expense being edited
   const [errors, setErrors] = useState({});
@@ -62,7 +63,6 @@ export default function ExpenseManagement() {
 
   useEffect(() => {
     checkForMissingCategoryConstants(expenses); // Perform the check on component mount
-    prepareDate(expenses);
   }, [expenses]);
 
   const handleChange = (e) => {
@@ -109,6 +109,10 @@ export default function ExpenseManagement() {
       if (editMode) {
         // Update the existing expense in IndexedDB
         await db.expenses.update(editExpenseId, newExpenseEntry);
+        toast.success(
+          `"${newExpenseEntry.expense_head}" updated successfully!`,
+          { position: "top-center" }
+        );
         setEditMode(false);
         setEditExpenseId(null);
       } else {
@@ -154,39 +158,50 @@ export default function ExpenseManagement() {
   };
 
   const handleDelete = async (expenseId) => {
-    // Remove the expense from IndexedDB
-    await db.expenses.delete(expenseId);
-
-    // Fetch updated expenses from IndexedDB and update the state
-    const updatedExpenses = await db.expenses.toArray();
-    setExpenses(updatedExpenses);
-  };
-
-  // Prepare date to export in excel and display in table
-  const prepareDate = (expenses) => {
-    const data = expenses.map((expense) => {
-      const categoryConstant = categoryConstants.find(
-        (categoryConstant) =>
-          categoryConstant.categoryId === Number(expense.categoryId)
+    const confirmDelete = new Promise((resolve, reject) => {
+      // Custom confirmation toast with buttons
+      const toastId = toast.info(
+        <div>
+          <p>Are you sure you want to delete this category?</p>
+          <button
+            className="custom-button"
+            onClick={() => {
+              toast.dismiss(toastId); // Close the toast when "Confirm" is clicked
+              resolve(true);
+            }}
+          >
+            Confirm
+          </button>
+          <button
+            className="custom-button"
+            style={{ marginLeft: "10px" }}
+            onClick={() => {
+              toast.dismiss(toastId); // Close the toast when "Cancel" is clicked
+              reject(false);
+            }}
+          >
+            Cancel
+          </button>
+        </div>,
+        { position: "top-center", autoClose: false, closeOnClick: false }
       );
-      const categoryName =
-        categories.find((cat) => cat.id === Number(expense.categoryId))?.name ||
-        "N/A";
-
-      const conversionConstant = categoryConstant?.monthly_conversion_constant;
-      const monthlyAmount =
-        conversionConstant && expense.amount
-          ? parseFloat((conversionConstant * expense.amount).toFixed(2))
-          : "N/A";
-
-      return [
-        expense.expense_head,
-        expense.amount,
-        categoryName,
-        monthlyAmount,
-      ];
     });
-    SetData(data);
+    try {
+      const isConfirmed = await confirmDelete;
+      if (isConfirmed) {
+        // Remove the expense from IndexedDB
+        await db.expenses.delete(expenseId);
+
+        // Fetch updated expenses from IndexedDB and update the state
+        const updatedExpenses = await db.expenses.toArray();
+        toast.success("Expenses deleted successfully!", {
+          position: "top-center",
+        });
+        setExpenses(updatedExpenses);
+      }
+    } catch (error) {
+      console.log("Delete calcelled");
+    }
   };
 
   // Check for all missing category constants and trigger the modal
@@ -221,6 +236,28 @@ export default function ExpenseManagement() {
   // Generate and download the .xlsx file
   const handleDownloadExcel = () => {
     const header = ["Expense Head", "Amount", "Category", "Monthly Amount"];
+    const data = expenses.map((expense) => {
+      const categoryConstant = categoryConstants.find(
+        (categoryConstant) =>
+          categoryConstant.categoryId === Number(expense.categoryId)
+      );
+      const categoryName =
+        categories.find((cat) => cat.id === Number(expense.categoryId))?.name ||
+        "N/A";
+
+      const conversionConstant = categoryConstant?.monthly_conversion_constant;
+      const monthlyAmount =
+        conversionConstant && expense.amount
+          ? parseFloat((conversionConstant * expense.amount).toFixed(2))
+          : "N/A";
+
+      return [
+        expense.expense_head,
+        expense.amount,
+        categoryName,
+        monthlyAmount,
+      ];
+    });
     const worksheetData = [header, ...data]; // Combine header with data rows
     const worksheet = XLSX.build([{ name: "Expenses", data: worksheetData }]);
 
@@ -424,6 +461,7 @@ export default function ExpenseManagement() {
           </div>
         </ModalBody>
       </Modal>
+      <ToastContainer />
     </>
   );
 }

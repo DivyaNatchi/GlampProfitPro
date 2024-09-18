@@ -13,6 +13,8 @@ import {
 import { useLoaderData } from "react-router-dom";
 import { db } from "../db/db";
 import "../styles/form.css";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export const commissionLoader = async () => {
   const existingCommission = await db.commissions.get(1); //The record always has id = 1
@@ -21,20 +23,25 @@ export const commissionLoader = async () => {
 
 export default function CommissionManagement() {
   const commissionData = useLoaderData();
-  const [commissionRateInput, setCommissionRateInput] = useState(
-    commissionData ? commissionData.commission_rate : ""
-  );
-  const [commissionRateDisplay, setCommissionRateDisplay] = useState(
-    commissionData ? commissionData.commission_rate : ""
-  );
+  const [commissionRateInput, setCommissionRateInput] = useState("");
+  // const [commissionRateDisplay, setCommissionRateDisplay] = useState(
+  //   commissionData ? commissionData.commission_rate : ""
+  // );
   const [errors, setErrors] = useState("");
-  const [lastUpdated, setLastUpdated] = useState(
-    commissionData ? commissionData.last_updated : ""
-  );
+  // const [lastUpdated, setLastUpdated] = useState(
+  //   commissionData ? commissionData.last_updated : ""
+  // );
 
   // Validation: Ensure value is a percentage (between 0 and 100)
   const validateCommission = (rate) => {
-    return !isNaN(rate) && rate >= 0 && rate <= 100;
+    console.log(rate);
+    if (rate === "") {
+      return false;
+    }
+
+    // Validate if it's a number and within the valid range
+    const parsedRate = parseFloat(rate);
+    return !isNaN(parsedRate) && parsedRate >= 0 && parsedRate <= 100;
   };
 
   const handleSubmit = async (e) => {
@@ -47,7 +54,7 @@ export default function CommissionManagement() {
     // Reset error state and set last updated date
     setErrors("");
     const now = new Date().toISOString().split("T")[0]; // Optional: Keep track of the last update
-    setLastUpdated(now);
+    // setLastUpdated(now);
 
     // Check if a commission record exists
     const existingCommission = await db.commissions.get(1);
@@ -58,6 +65,9 @@ export default function CommissionManagement() {
         commission_rate: Number(commissionRateInput),
         last_updated: now,
       });
+      toast.success("commission rate updated successfully", {
+        position: "top-center",
+      });
     } else {
       // If no record exists, add a new one with id = 1
       await db.commissions.add({
@@ -65,10 +75,13 @@ export default function CommissionManagement() {
         commission_rate: Number(commissionRateInput),
         last_updated: now,
       });
+      toast.success("commission rate added successfully", {
+        position: "top-center",
+      });
     }
 
     // Update display state with the new commission rate
-    setCommissionRateDisplay(commissionRateInput);
+    // setCommissionRateDisplay(commissionRateInput);
     setCommissionRateInput(""); // reset input field
   };
 
@@ -109,14 +122,15 @@ export default function CommissionManagement() {
           </FormGroup>
         </fieldset>
       </Form>
-      {lastUpdated && (
+      <ToastContainer />
+      {/* {lastUpdated && (
         <p className="mt-3">
           Last Updated Commission Rate:{" "}
           <strong>{commissionRateDisplay}%</strong>
           <br />
           Last Updated Date: <strong>{lastUpdated}</strong>
         </p>
-      )}
+      )} */}
     </Container>
   );
 }
