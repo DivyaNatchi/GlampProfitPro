@@ -18,7 +18,7 @@ import { useLoaderData } from "react-router-dom";
 import { db } from "../db/db";
 import "../styles/form.css";
 import "../styles/table.css";
-import * as XLSX from "node-xlsx"; // Import node-xlsx for Excel operations
+import ExcelJS from "exceljs";
 import FileSaver from "file-saver"; // To save files in browser
 import { FaFileDownload, FaEdit, FaTrash } from "react-icons/fa";
 import { ToastContainer, toast } from "react-toastify";
@@ -233,9 +233,72 @@ export default function ExpenseManagement() {
     }
   };
 
-  // Generate and download the .xlsx file
+  // Function to generate and download Excel file
   const handleDownloadExcel = () => {
-    const header = ["Expense Head", "Amount", "Category", "Monthly Amount"];
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Expenses");
+
+    // Remove gridlines
+    worksheet.views = [{ showGridLines: false }];
+
+    // Define column widths and headers
+    const colWidths = [
+      { header: "Expense Head", width: 32 },
+      { header: "Amount", width: 15 },
+      { header: "Category", width: 20 },
+      { header: "Monthly Amount", width: 22 },
+    ];
+
+    worksheet.columns = colWidths;
+
+    // Increase header row height
+    worksheet.getRow(1).height = 25; // Set header row height
+
+    // Merge cells in the first row for the header
+    worksheet.mergeCells("A1:D1");
+
+    // Set value for the merged cell
+    const headerCell = worksheet.getCell("A1");
+    headerCell.value = "Monthly Expenses";
+    headerCell.border = {
+      top: { style: "thin" },
+      left: { style: "thin" },
+      bottom: { style: "thin" },
+      right: { style: "thin" },
+    };
+
+    // Apply styles to the merged cell
+    headerCell.font = { bold: true, size: 14, color: { argb: "FFFFFFFF" } };
+    headerCell.fill = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "FF00BF8F" }, // Background color
+    };
+    headerCell.alignment = { horizontal: "center", vertical: "middle" };
+
+    // Add headers in the second row
+    worksheet.addRow(["Expense Head", "Amount", "Category", "Monthly Amount"]);
+
+    // Apply styles to the header row
+    worksheet.getRow(2).eachCell((cell) => {
+      cell.font = { bold: true, size: 14, color: { argb: "FF00BF8F" } };
+      cell.fill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: { argb: "FFFFFFFF" }, // Header background color
+      };
+      cell.alignment = { horizontal: "center", vertical: "middle" };
+
+      // Apply cell borders
+      cell.border = {
+        top: { style: "thin" },
+        left: { style: "thin" },
+        bottom: { style: "thin" },
+        right: { style: "thin" },
+      };
+    });
+
+    // Add data rows
     const data = expenses.map((expense) => {
       const categoryConstant = categoryConstants.find(
         (categoryConstant) =>
@@ -244,8 +307,8 @@ export default function ExpenseManagement() {
       const categoryName =
         categories.find((cat) => cat.id === Number(expense.categoryId))?.name ||
         "N/A";
-
       const conversionConstant = categoryConstant?.monthly_conversion_constant;
+
       const monthlyAmount =
         conversionConstant && expense.amount
           ? parseFloat((conversionConstant * expense.amount).toFixed(2))
@@ -253,19 +316,44 @@ export default function ExpenseManagement() {
 
       return [
         expense.expense_head,
-        expense.amount,
+        parseFloat(expense.amount).toFixed(2), // Format Amount to 2 decimal places
         categoryName,
-        monthlyAmount,
+        monthlyAmount !== "N/A" ? monthlyAmount.toFixed(2) : "N/A", // Format Monthly Amount
       ];
     });
-    const worksheetData = [header, ...data]; // Combine header with data rows
-    const worksheet = XLSX.build([{ name: "Expenses", data: worksheetData }]);
 
-    // Create a Blob and trigger download using FileSaver
-    const blob = new Blob([worksheet], {
-      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    // Append the data rows to the worksheet
+    data.forEach((row) => {
+      const addedRow = worksheet.addRow(row);
+
+      // Apply left alignment for Amount and Monthly Amount
+      addedRow.getCell(2).alignment = {
+        horizontal: "right",
+        vertical: "middle",
+      }; // Amount column
+      addedRow.getCell(4).alignment = {
+        horizontal: "right",
+        vertical: "middle",
+      }; // Monthly Amount column
+
+      // Apply cell borders for each data row
+      addedRow.eachCell((cell) => {
+        cell.border = {
+          top: { style: "thin" },
+          left: { style: "thin" },
+          bottom: { style: "thin" },
+          right: { style: "thin" },
+        };
+      });
     });
-    FileSaver.saveAs(blob, "Expenses.xlsx");
+
+    // Generate the Excel file and trigger download
+    workbook.xlsx.writeBuffer().then((buffer) => {
+      const blob = new Blob([buffer], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+      FileSaver.saveAs(blob, "Expenses.xlsx");
+    });
   };
 
   return (
