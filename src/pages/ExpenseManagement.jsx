@@ -9,10 +9,6 @@ import {
   Button,
   Container,
   FormFeedback,
-  Modal,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
 } from "reactstrap";
 import { useLoaderData } from "react-router-dom";
 import { db } from "../db/db";
@@ -23,6 +19,10 @@ import FileSaver from "file-saver"; // To save files in browser
 import { FaFileDownload, FaEdit, FaTrash } from "react-icons/fa";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import {
+  categoryOptions,
+  getMissingCategoryConstants,
+} from "../constant/Constants";
 
 // Loader function to fetch expenses from IndexedDB expenses table
 export const expenseLoader = async () => {
@@ -30,21 +30,12 @@ export const expenseLoader = async () => {
   const categoryConstants = await db.category_constants.toArray();
   return { expenses, categoryConstants };
 };
-
-const categories = [
-  { id: 1, name: "Daily" },
-  { id: 2, name: "Weekly" },
-  { id: 3, name: "Bi-Weekly" },
-  { id: 4, name: "Semi-Monthly" },
-  { id: 5, name: "Monthly" },
-  { id: 6, name: "Bi-Monthly" },
-  { id: 7, name: "Quarterly" },
-  { id: 8, name: "Tri-Annual" },
-  { id: 9, name: "Bi-Annual" },
-  { id: 10, name: "Yearly" },
-  { id: 11, name: "Biennial" },
-  { id: 12, name: "Per Booking" },
-];
+const categories = [...categoryOptions];
+categories.push({
+  id: 12,
+  name: "Per Booking",
+  description: "Applicable for every booking",
+});
 
 export default function ExpenseManagement() {
   const { expenses: initialExpenses, categoryConstants } = useLoaderData();
@@ -58,12 +49,17 @@ export default function ExpenseManagement() {
   const [editMode, setEditMode] = useState(false); // New state to track edit mode
   const [editExpenseId, setEditExpenseId] = useState(null); // Store the id of the expense being edited
   const [errors, setErrors] = useState({});
-  const [modal, setModal] = useState(false);
   const [missingCategories, setMissingCategories] = useState([]);
 
   useEffect(() => {
-    checkForMissingCategoryConstants(expenses); // Perform the check on component mount
-  }, [expenses]);
+    // Fetch missing categories on component mount
+    const fetchMissingCategories = async () => {
+      const missingCategoriesData = await getMissingCategoryConstants();
+      setMissingCategories(missingCategoriesData);
+    };
+
+    fetchMissingCategories();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -201,35 +197,6 @@ export default function ExpenseManagement() {
       }
     } catch (error) {
       console.log("Delete calcelled");
-    }
-  };
-
-  // Check for all missing category constants and trigger the modal
-  const checkForMissingCategoryConstants = (expenses) => {
-    const missingCategoryList = new Set();
-
-    expenses.forEach((expense) => {
-      if (Number(expense.categoryId != 12)) {
-        const categoryConstant = categoryConstants.find(
-          (cat) => cat.categoryId === Number(expense.categoryId)
-        );
-
-        // If the category constant is missing, add to the missingCategoryList
-        if (!categoryConstant) {
-          const missingCategoryName = categories.find(
-            (cat) => cat.id === Number(expense.categoryId)
-          )?.name;
-          if (missingCategoryName) {
-            missingCategoryList.add(missingCategoryName);
-          }
-        }
-      }
-    });
-
-    // If there are missing categories, set the modal to open
-    if (missingCategoryList.size > 0) {
-      setMissingCategories(missingCategoryList);
-      setModal(true); // Open the modal
     }
   };
 
@@ -409,7 +376,7 @@ export default function ExpenseManagement() {
                 <option value="">Select a category</option>
                 {categories.map((category) => (
                   <option key={category.id} value={category.id}>
-                    {category.name}
+                    {category.name} - {category.description}
                   </option>
                 ))}
               </Input>
@@ -457,6 +424,22 @@ export default function ExpenseManagement() {
             </FormGroup>
           </fieldset>
         </Form>
+        {missingCategories.length > 0 && (
+          <div className="missingCategory">
+            <h5>
+              {missingCategories.length === 1
+                ? "Please contact the Franchisor, the following monthly conversion constant is not available:"
+                : "Please contact the Franchisor, the following monthly conversion constants are not available:"}
+            </h5>
+            <ul className="missing-categories-list">
+              {missingCategories.map((missingCategory) => (
+                <li key={missingCategory.id} className="missing-category-item">
+                  {missingCategory.name}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </Container>
       {/* Render the table only if there are expenses */}
       {expenses.length > 0 && (
@@ -486,7 +469,7 @@ export default function ExpenseManagement() {
               {expenses.map((expense) => (
                 <tr key={expense.id}>
                   <td>{expense.expense_head}</td>
-                  <td>{expense.amount}</td>
+                  <td>{expense.amount.toFixed(2)}</td>
                   <td>
                     {categories.find(
                       (cat) => cat.id === Number(expense.categoryId)
@@ -497,7 +480,15 @@ export default function ExpenseManagement() {
                       (categoryConstant) =>
                         categoryConstant.categoryId ===
                         Number(expense.categoryId)
-                    )?.monthly_conversion_constant * expense.amount || "N/A"}
+                    )
+                      ? (
+                          categoryConstants.find(
+                            (categoryConstant) =>
+                              categoryConstant.categoryId ===
+                              Number(expense.categoryId)
+                          ).monthly_conversion_constant * expense.amount
+                        ).toFixed(2)
+                      : "N/A"}
                   </td>
                   <td>
                     <FaEdit
@@ -524,31 +515,6 @@ export default function ExpenseManagement() {
           </Table>
         </Container>
       )}
-      <Modal isOpen={modal} toggle={() => setModal(false)} centered size="md">
-        <ModalHeader toggle={() => setModal(false)} className="model-header">
-          Missing Category Constants
-        </ModalHeader>
-        <ModalBody>
-          <p>
-            The following category constants are not available for monthly
-            conversion:
-          </p>
-          <ul>
-            {[...missingCategories].map((category) => (
-              <li key={category}>{category}</li>
-            ))}
-          </ul>
-          <p>Please contact the franchisor.</p>
-          <div className="text-center">
-            <Button
-              onClick={() => setModal(false)}
-              className="mt-3 custom-button"
-            >
-              OK
-            </Button>
-          </div>
-        </ModalBody>
-      </Modal>
       <ToastContainer />
     </>
   );

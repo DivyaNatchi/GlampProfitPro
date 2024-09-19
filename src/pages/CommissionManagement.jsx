@@ -1,5 +1,5 @@
 // src/components/CommissionManagement.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Form,
   FormGroup,
@@ -24,30 +24,58 @@ export const commissionLoader = async () => {
 export default function CommissionManagement() {
   const commissionData = useLoaderData();
   const [commissionRateInput, setCommissionRateInput] = useState("");
-  // const [commissionRateDisplay, setCommissionRateDisplay] = useState(
-  //   commissionData ? commissionData.commission_rate : ""
-  // );
+  const [commissionRateDisplay, setCommissionRateDisplay] = useState(
+    commissionData ? commissionData.commission_rate : ""
+  );
   const [errors, setErrors] = useState("");
   // const [lastUpdated, setLastUpdated] = useState(
   //   commissionData ? commissionData.last_updated : ""
   // );
 
-  // Validation: Ensure value is a percentage (between 0 and 100)
+  // Use useEffect to set commissionRateInput when commissionRateDisplay is available
+  useEffect(() => {
+    if (commissionRateDisplay) {
+      setCommissionRateInput(commissionRateDisplay);
+    }
+  }, [commissionRateDisplay]);
+
+  // Validation: Ensure value is a percentage (between 0 and 100) and length is greater than 5
   const validateCommission = (rate) => {
-    console.log(rate);
+    // Check if the input is empty
     if (rate === "") {
-      return false;
+      return {
+        isValid: false,
+        errorMessage: "Please enter the commission rate.",
+      };
     }
 
-    // Validate if it's a number and within the valid range
+    // Validate if it's a number and within the valid range (0-100)
     const parsedRate = parseFloat(rate);
-    return !isNaN(parsedRate) && parsedRate >= 0 && parsedRate <= 100;
+    if (isNaN(parsedRate) || parsedRate < 0 || parsedRate > 100) {
+      return {
+        isValid: false,
+        errorMessage: "Please enter a valid percentage between 0 and 100.",
+      };
+    }
+
+    // Check if the input length is greater than 5
+    if (rate.length > 5) {
+      return {
+        isValid: false,
+        errorMessage: "Allowed length is only 5 characters.",
+      };
+    }
+
+    // If all validations pass
+    return { isValid: true, errorMessage: "" };
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!validateCommission(commissionRateInput)) {
-      setErrors("Please enter a valid percentage between 0 and 100.");
+    const validation = validateCommission(commissionRateInput);
+
+    if (!validation.isValid) {
+      setErrors(validation.errorMessage); // Set the appropriate error message based on validation
       return;
     }
 
@@ -65,7 +93,7 @@ export default function CommissionManagement() {
         commission_rate: Number(commissionRateInput),
         last_updated: now,
       });
-      toast.success("commission rate updated successfully", {
+      toast.success("Commission rate updated successfully", {
         position: "top-center",
       });
     } else {
@@ -75,18 +103,23 @@ export default function CommissionManagement() {
         commission_rate: Number(commissionRateInput),
         last_updated: now,
       });
-      toast.success("commission rate added successfully", {
+      toast.success("Commission rate added successfully", {
         position: "top-center",
       });
     }
 
     // Update display state with the new commission rate
-    // setCommissionRateDisplay(commissionRateInput);
+    setCommissionRateDisplay(commissionRateInput);
     setCommissionRateInput(""); // reset input field
   };
 
   const handleChange = (e) => {
-    setCommissionRateInput(e.target.value);
+    const { value } = e.target;
+    setCommissionRateInput(value);
+
+    // Perform validation
+    const validation = validateCommission(value);
+    setErrors(validation.errorMessage);
   };
 
   return (
