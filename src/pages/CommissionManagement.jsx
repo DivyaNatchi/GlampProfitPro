@@ -62,7 +62,7 @@ export default function CommissionManagement() {
     if (rate.length > 5) {
       return {
         isValid: false,
-        errorMessage: "Allowed length is only 5 characters.",
+        errorMessage: "Allowed length is only 5 digits.",
       };
     }
 
@@ -93,7 +93,7 @@ export default function CommissionManagement() {
         commission_rate: Number(commissionRateInput),
         last_updated: now,
       });
-      toast.success("Commission rate updated successfully", {
+      toast.success("Commission rate updated successfully!", {
         position: "top-center",
       });
     } else {
@@ -103,7 +103,7 @@ export default function CommissionManagement() {
         commission_rate: Number(commissionRateInput),
         last_updated: now,
       });
-      toast.success("Commission rate added successfully", {
+      toast.success("Commission rate added successfully!", {
         position: "top-center",
       });
     }

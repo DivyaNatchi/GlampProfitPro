@@ -174,6 +174,7 @@ export default function ExpenseCategoryManagement() {
 
   // Handle editing a category constant
   const handleEdit = (categoryConstant) => {
+    console.log("inside edit: ", categoryConstant);
     setNewConstant({
       categoryId: categoryConstant.categoryId,
       monthlyConversionConstant: categoryConstant.monthly_conversion_constant,
@@ -183,17 +184,55 @@ export default function ExpenseCategoryManagement() {
 
   // Handle deleting a category constant
   const handleDelete = async (categoryConstant) => {
-    console.log(categoryConstant);
-    await db.category_constants.delete(categoryConstant.id);
-    toast.success(
-      `Category "${categoryConstant.name}" monthly convertion constant deleted successfully!`,
-      {
-        position: "top-center",
-      }
-    );
+    const confirmDelete = new Promise((resolve, reject) => {
+      // Custom confirmation toast with buttons
+      const toastId = toast.info(
+        <div>
+          <p>
+            Are you sure you want to delete {categoryConstant.name} monthly
+            conversion constant?
+          </p>
+          <button
+            className="custom-button"
+            onClick={() => {
+              toast.dismiss(toastId); // Close the toast when "Confirm" is clicked
+              resolve(true);
+            }}
+          >
+            Confirm
+          </button>
+          <button
+            className="custom-button"
+            style={{ marginLeft: "10px" }}
+            onClick={() => {
+              toast.dismiss(toastId); // Close the toast when "Cancel" is clicked
+              reject(false);
+            }}
+          >
+            Cancel
+          </button>
+        </div>,
+        { position: "top-center", autoClose: false, closeOnClick: false }
+      );
+    });
+    try {
+      const isConfirmed = await confirmDelete;
+      if (isConfirmed) {
+        // Remove the expense from IndexedDB
+        await db.category_constants.delete(categoryConstant.id);
+        toast.success(
+          `Category "${categoryConstant.name}" monthly convertion constant deleted successfully!`,
+          {
+            position: "top-center",
+          }
+        );
 
-    const updatedConstants = await db.category_constants.toArray();
-    setConstants(updatedConstants);
+        const updatedConstants = await db.category_constants.toArray();
+        setConstants(updatedConstants);
+      }
+    } catch (error) {
+      console.log("Delete cancelled for Monthly conversion constant");
+    }
   };
 
   // Handle cancel action
@@ -228,6 +267,29 @@ export default function ExpenseCategoryManagement() {
                 invalid={!!errors.categoryId}
               >
                 <option value="">Select a Category</option>
+
+                {/* When editing, include the selected category even if it's not in missingCategories */}
+                {editingId && (
+                  <option
+                    key={newConstant.categoryId}
+                    value={newConstant.categoryId}
+                  >
+                    {/* Find the name and description for the selected category */}
+                    {
+                      constants.find(
+                        (c) => c.categoryId === newConstant.categoryId
+                      )?.name
+                    }{" "}
+                    -{" "}
+                    {
+                      constants.find(
+                        (c) => c.categoryId === newConstant.categoryId
+                      )?.description
+                    }
+                  </option>
+                )}
+
+                {/* Render the missing categories */}
                 {missingCategories.map((category) => (
                   <option key={category.id} value={category.id}>
                     {category.name} - {category.description}
@@ -307,7 +369,7 @@ export default function ExpenseCategoryManagement() {
           >
             <thead>
               <tr>
-                <th colSpan="5" className="text-center monthly-expense-header">
+                <th colSpan="5" className="text-center table-header">
                   Monthly Conversion Constant
                 </th>
               </tr>

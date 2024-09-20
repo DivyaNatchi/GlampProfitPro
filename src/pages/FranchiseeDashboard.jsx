@@ -15,7 +15,7 @@ export default function FranchiseeDashboard() {
               to="."
               end
             >
-              Calculate Rental Rate
+              Pod Rent Calculator
             </NavLink>
           </NavItem>
           <NavItem>

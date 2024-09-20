@@ -8,7 +8,7 @@ thead th {
 }
 
 /* Monthly Expenses Header styling (if applicable) */
-thead th.monthly-expense-header {
+.table-header {
   background-color: #007b5e !important; /* Different color for Monthly Expense header */
   color: white !important;
 }

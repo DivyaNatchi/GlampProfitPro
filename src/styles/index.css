@@ -44,20 +44,3 @@ main {
   padding: 10px;
   color: #007b5e;
 }
-
-.model-header {
-  background-color: #00bf8f;
-  color: white;
-  font-weight: 200;
-}
-
-/* Center the modal vertically and horizontally */
-.custom-modal {
-  top: 25%;
-}
-
-.model-header {
-  background-color: #00bf8f;
-  color: white;
-  font-weight: 200;
-}

@@ -61,35 +61,64 @@ export default function ExpenseManagement() {
     fetchMissingCategories();
   }, []);
 
+  // Field-level validation function
+  const validateField = (name, value) => {
+    let error = "";
+
+    switch (name) {
+      case "expense_head":
+        if (!value.trim()) {
+          error = "Please enter an expense head.";
+        }
+        break;
+      case "amount":
+        if (!validateAmount(value)) {
+          error = "Please enter a valid amount.";
+        } else if (value.length > 7) {
+          error =
+            "Amount should not exceed 7 digits, please enter a valid amount.";
+        }
+        break;
+      case "categoryId":
+        if (!value) {
+          error = "Please select a category.";
+        }
+        break;
+      default:
+        break;
+    }
+
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      [name]: error,
+    }));
+
+    return error === ""; // Return whether the field is valid or not
+  };
+
+  // Handle field change and field-level validation
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+    // Set the new value in state
     setNewExpense({ ...newExpense, [name]: value });
+
+    // Validate the field
+    validateField(name, value);
   };
 
   const validateAmount = (amount) => {
     return !isNaN(amount) && Number(amount) > 0;
   };
 
+  // Full form validation function
   const validateForm = () => {
     let formIsValid = true;
-    let validationErrors = {};
 
-    if (!newExpense.expense_head.trim()) {
-      formIsValid = false;
-      validationErrors.expense_head = "Please enter an expense head.";
-    }
+    formIsValid &= validateField("expense_head", newExpense.expense_head);
+    formIsValid &= validateField("amount", newExpense.amount);
+    formIsValid &= validateField("categoryId", newExpense.categoryId);
 
-    if (!validateAmount(newExpense.amount)) {
-      formIsValid = false;
-      validationErrors.amount = "Please enter a valid amount.";
-    }
-
-    if (!newExpense.categoryId) {
-      formIsValid = false;
-      validationErrors.categoryId = "Please select a category.";
-    }
-
-    setErrors(validationErrors);
     return formIsValid;
   };
 
@@ -106,7 +135,7 @@ export default function ExpenseManagement() {
         // Update the existing expense in IndexedDB
         await db.expenses.update(editExpenseId, newExpenseEntry);
         toast.success(
-          `"${newExpenseEntry.expense_head}" updated successfully!`,
+          `"${newExpenseEntry.expense_head}" expense updated successfully!`,
           { position: "top-center" }
         );
         setEditMode(false);
@@ -114,6 +143,12 @@ export default function ExpenseManagement() {
       } else {
         // Save the new expense to IndexedDB
         await db.expenses.add(newExpenseEntry);
+        toast.success(
+          `"${newExpenseEntry.expense_head}" expense added successfully!`,
+          {
+            position: "top-center",
+          }
+        );
       }
 
       // Fetch updated expenses from IndexedDB and update the state
@@ -153,12 +188,14 @@ export default function ExpenseManagement() {
     setEditExpenseId(expense.id); // Store the id of the expense being edited
   };
 
-  const handleDelete = async (expenseId) => {
+  const handleDelete = async (expense) => {
     const confirmDelete = new Promise((resolve, reject) => {
       // Custom confirmation toast with buttons
       const toastId = toast.info(
         <div>
-          <p>Are you sure you want to delete this category?</p>
+          <p>
+            Are you sure you want to delete {expense.expense_head} expenses?
+          </p>
           <button
             className="custom-button"
             onClick={() => {
@@ -186,24 +223,28 @@ export default function ExpenseManagement() {
       const isConfirmed = await confirmDelete;
       if (isConfirmed) {
         // Remove the expense from IndexedDB
-        await db.expenses.delete(expenseId);
+        await db.expenses.delete(expense.id);
 
         // Fetch updated expenses from IndexedDB and update the state
         const updatedExpenses = await db.expenses.toArray();
-        toast.success("Expenses deleted successfully!", {
+        toast.success("Expense deleted successfully!", {
           position: "top-center",
         });
         setExpenses(updatedExpenses);
       }
     } catch (error) {
-      console.log("Delete calcelled");
+      console.log("Delete cancelled for the expense");
     }
   };
 
   // Function to generate and download Excel file
   const handleDownloadExcel = () => {
     const workbook = new ExcelJS.Workbook();
-    const worksheet = workbook.addWorksheet("Expenses");
+    const worksheet = workbook.addWorksheet("ExpenseList");
+    const now = new Date();
+    const formattedDate = now.toISOString().split("T")[0]; // Get YYYY-MM-DD
+    const formattedTime = now.toTimeString().split(" ")[0].replace(/:/g, ""); // Get hhmmss
+    const fileName = `ExpenseList${formattedDate}-${formattedTime}.xlsx`;
 
     // Remove gridlines
     worksheet.views = [{ showGridLines: false }];
@@ -319,7 +360,7 @@ export default function ExpenseManagement() {
       const blob = new Blob([buffer], {
         type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
       });
-      FileSaver.saveAs(blob, "Expenses.xlsx");
+      FileSaver.saveAs(blob, fileName);
     });
   };
 
@@ -410,7 +451,7 @@ export default function ExpenseManagement() {
                 aria-label="Add Expense"
                 className="custom-button"
               >
-                {editMode ? "Edit Expenses" : "Add Expense"}
+                Save Expense
               </Button>
               <Button
                 type="button"
@@ -447,7 +488,7 @@ export default function ExpenseManagement() {
           <Table hover responsive aria-label="Expense Table">
             <thead>
               <tr>
-                <th colSpan="5" className="text-center monthly-expense-header">
+                <th colSpan="5" className="text-center table-header">
                   Monthly Expenses
                   <FaFileDownload
                     size={20}
@@ -505,7 +546,7 @@ export default function ExpenseManagement() {
                         marginLeft: "10px",
                         color: "red",
                       }}
-                      onClick={() => handleDelete(expense.id)}
+                      onClick={() => handleDelete(expense)}
                       aria-label="Delete Expense"
                     />
                   </td>

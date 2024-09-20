@@ -161,9 +161,14 @@ export default function RentalRateCalculator() {
     );
 
     setCalculatedResults({
-      rentalRate: expectedRentPerDayWithAllExpensesAndCommission,
+      occupiedRoomsPerMonth,
+      totalOccupiedRoomDays,
+      totalMonthlyExpenses,
+      totalExpensesPerOccupiedRoomDay,
+      revenuePerOccupiedRoomDay,
+      expectedRentPerDayWithAllExpenses,
       franchiserCommission,
-      monthlyExpenses: totalMonthlyExpenses,
+      expectedRentPerDayWithAllExpensesAndCommission,
     });
 
     const amountFromCustomer = parseFloat(
@@ -185,7 +190,9 @@ export default function RentalRateCalculator() {
       (balanceAfterExpenses - reverseFranchisorCommission).toFixed(2)
     );
     setreverseCalculationResults({
+      expectedRentPerDayWithAllExpensesAndCommission,
       amountFromCustomer,
+      totalMonthlyExpenses,
       reverseFranchisorCommission,
       balanceAfterCommission,
     });
@@ -217,6 +224,9 @@ export default function RentalRateCalculator() {
       case "expectedMonthlyRevenue":
         if (isNaN(value) || value <= 0) {
           fieldError = "Please enter a valid positive amount.";
+        } else if (value.length > 7) {
+          fieldError =
+            "Amount should not exceed 7 digits, please enter a valid amount.";
         }
         break;
       case "numberOfPods":
@@ -418,8 +428,7 @@ export default function RentalRateCalculator() {
               />
               <FormFeedback>{errors.expectedOccupancyPercentage}</FormFeedback>
               <FormText>
-                The percentage of time the pods are expected to be occupied.
-                Should not exceed 5 digits.
+                The percentage of time the pods are expected to be occupied (%).
               </FormText>
             </FormGroup>
 
@@ -469,14 +478,15 @@ export default function RentalRateCalculator() {
           <Row>
             {/* First Table */}
             <Col lg="6" md="6" sm="12">
-              <Table hover responsive aria-label="Calculated Room Rent Table">
+              <Table
+                hover
+                responsive
+                aria-label="Per Pod Rent Per Day Calcualtion Table"
+              >
                 <thead>
                   <tr>
-                    <th
-                      colSpan="2"
-                      className="text-center monthly-expense-header"
-                    >
-                      Calculated Room Rent
+                    <th colSpan="2" className="text-center table-header">
+                      Per Pod Rent Per Day Calcualtion
                     </th>
                   </tr>
                   <tr>
@@ -486,16 +496,57 @@ export default function RentalRateCalculator() {
                 </thead>
                 <tbody>
                   <tr>
-                    <td>Calculated Monthly Expenses</td>
-                    <td>{calculatedResults.monthlyExpenses.toFixed(2)}</td>
+                    <td>
+                      Occupied Pods Per Month considering occupancy rate
+                      (Estimated)
+                    </td>
+                    <td>
+                      {calculatedResults.occupiedRoomsPerMonth.toFixed(2)}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Total Pod Occupied Days</td>
+                    <td>
+                      {calculatedResults.totalOccupiedRoomDays.toFixed(2)}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Total Monthly Expenses</td>
+                    <td>{calculatedResults.totalMonthlyExpenses.toFixed(2)}</td>
+                  </tr>
+                  <tr>
+                    <td>Expenses per Occupied Pod</td>
+                    <td>
+                      {calculatedResults.totalExpensesPerOccupiedRoomDay.toFixed(
+                        2
+                      )}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Revenue per Occupied Pod</td>
+                    <td>
+                      {calculatedResults.revenuePerOccupiedRoomDay.toFixed(2)}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Expected Daily Rent (with Expenses)</td>
+                    <td>
+                      {calculatedResults.expectedRentPerDayWithAllExpenses.toFixed(
+                        2
+                      )}
+                    </td>
                   </tr>
                   <tr>
                     <td>Franchisor Commission</td>
                     <td>{calculatedResults.franchiserCommission.toFixed(2)}</td>
                   </tr>
                   <tr>
-                    <td>Expected Rental Rate Per Room</td>
-                    <td>{calculatedResults.rentalRate.toFixed(2)}</td>
+                    <td className="table-header">Per Pod Rent Per Day</td>
+                    <td className="table-header">
+                      {calculatedResults.expectedRentPerDayWithAllExpensesAndCommission.toFixed(
+                        2
+                      )}
+                    </td>
                   </tr>
                 </tbody>
               </Table>
@@ -503,14 +554,11 @@ export default function RentalRateCalculator() {
 
             {/* Second Table */}
             <Col lg="6" md="6" sm="12">
-              <Table hover responsive aria-label="Reverse Calculation Table">
+              <Table hover responsive aria-label="Monthly Summary Table">
                 <thead>
                   <tr>
-                    <th
-                      colSpan="2"
-                      className="text-center monthly-expense-header"
-                    >
-                      Reverse calculation for Calculated Room Rent
+                    <th colSpan="2" className="text-center table-header">
+                      Monthly Summary
                     </th>
                   </tr>
                   <tr>
@@ -520,9 +568,28 @@ export default function RentalRateCalculator() {
                 </thead>
                 <tbody>
                   <tr>
-                    <td>Total Amount Collected from the Customer in a Month</td>
+                    <td>Pod Rent Per Day</td>
+                    <td>
+                      {reverseCalculationResults.expectedRentPerDayWithAllExpensesAndCommission.toFixed(
+                        2
+                      )}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      Total Monthly Income (at{" "}
+                      {formData.expectedOccupancyPercentage}% Occupancy)
+                    </td>
                     <td>
                       {reverseCalculationResults.amountFromCustomer.toFixed(2)}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Total Monthly Expensesh</td>
+                    <td>
+                      {reverseCalculationResults.totalMonthlyExpenses.toFixed(
+                        2
+                      )}
                     </td>
                   </tr>
                   <tr>
@@ -534,7 +601,7 @@ export default function RentalRateCalculator() {
                     </td>
                   </tr>
                   <tr>
-                    <td>Balance after Expenses and Commission</td>
+                    <td>Net Franchisee Income (Before Tax)</td>
                     <td>
                       {reverseCalculationResults.balanceAfterCommission.toFixed(
                         2
