@@ -512,9 +512,11 @@ export default function ExpenseManagement() {
                   <td>{expense.expense_head}</td>
                   <td>{expense.amount.toFixed(2)}</td>
                   <td>
-                    {categories.find(
-                      (cat) => cat.id === Number(expense.categoryId)
-                    )?.name || "N/A"}
+                    {
+                      categories.find(
+                        (cat) => cat.id === Number(expense.categoryId)
+                      )?.name
+                    }
                   </td>
                   <td>
                     {categoryConstants.find(

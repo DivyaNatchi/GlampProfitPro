@@ -110,7 +110,7 @@ export default function RentalRateCalculator() {
       return;
     }
 
-    const category = categories.find((cat) => Number(cat.categoryId) === 1);
+    // const category = categories.find((cat) => Number(cat.categoryId) === 1);
 
     const occupiedRoomsPerMonth = parseFloat(
       (
@@ -476,6 +476,8 @@ export default function RentalRateCalculator() {
                 reverseCalculationResults={reverseCalculationResults}
                 formData={formData}
                 commission={commissionRate}
+                expenses={expenses}
+                categories={categories}
               />
             )}
           </Container>

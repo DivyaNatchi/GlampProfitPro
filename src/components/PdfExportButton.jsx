@@ -15,12 +15,12 @@ import { monthNames, wigwamLogo } from "../constant/Constants.jsx";
 // Define styles for the PDF content
 const styles = StyleSheet.create({
   page: {
-    padding: 30,
-    fontSize: 12,
+    padding: 40, // This applies 40 to all sides (top, right, bottom, left)
+    paddingHorizontal: 30, // This applies 30 to left and right
+    fontSize: 10,
   },
   header: {
-    backgroundColor: "#00bf8f", // Background color
-    padding: 5,
+    backgroundColor: "#00bf8f",
     display: "flex",
     flexDirection: "row",
     alignItems: "center",
@@ -32,9 +32,7 @@ const styles = StyleSheet.create({
     height: 20,
   },
   title: {
-    fontSize: 15,
     color: "#fff",
-    fontWeight: "bold",
     textAlign: "center",
   },
   tableHeader: {
@@ -93,24 +91,27 @@ const styles = StyleSheet.create({
     padding: 2,
     borderRight: "1px solid #000",
     borderBottom: "1px solid #000",
+    textAlign: "right",
   },
   category: {
-    width: "15%",
+    width: "20%",
     padding: 2,
     borderRight: "1px solid #000",
     borderBottom: "1px solid #000",
   },
   constant: {
-    width: "25%",
+    width: "20%",
     padding: 2,
     borderRight: "1px solid #000",
     borderBottom: "1px solid #000",
+    textAlign: "right",
   },
   monthlyAmount: {
     width: "15%",
     padding: 2,
     borderRight: "1px solid #000",
     borderBottom: "1px solid #000",
+    textAlign: "right",
   },
 });
 
@@ -120,19 +121,40 @@ const PdfDocument = ({
   reverseCalculationResults,
   formData,
   commission,
+  expenses,
+  categories,
 }) => {
-  formData;
   console.log("formData", formData);
+  console.log("PdfDocument : categories", categories);
+
   // Set current date and time
   const currentDate = new Date().toLocaleDateString();
   const currentTime = new Date().toLocaleTimeString();
+
+  const getCategoryConstant = (categoryId) => {
+    const category = categories.find(
+      (cat) => Number(cat.categoryId) === Number(categoryId)
+    );
+    return Number(category?.monthly_conversion_constant);
+  };
+
+  const getConstantName = (categoryId) => {
+    console.log("getConstantName : categoryId", categoryId);
+    console.log("getConstantName : categories", categories);
+    return categories.find(
+      (cat) => Number(cat.categoryId) === Number(categoryId)
+    )?.name;
+  };
+
   return (
     <Document>
       <Page style={styles.page}>
         {/* Header Section */}
         <View style={styles.header}>
           <Image src={wigwamLogo} style={styles.logo} />
-          <Text style={styles.title}>Pod Rent Calculation</Text>
+          <Text style={[styles.title, { fontWeight: "900" }]}>
+            Pod Rent Calculation
+          </Text>
         </View>
         <View>
           <Text style={styles.dateSection}>
@@ -150,7 +172,12 @@ const PdfDocument = ({
               >
                 Month
               </Text>
-              <Text style={[styles.value, { borderTop: "1px solid #000" }]}>
+              <Text
+                style={[
+                  styles.value,
+                  { borderTop: "1px solid #000", textAlign: "left" },
+                ]}
+              >
                 {monthNames[formData?.month]} {formData?.year}
               </Text>
             </View>
@@ -158,7 +185,7 @@ const PdfDocument = ({
               <Text style={[styles.description, { color: "#00bf8f" }]}>
                 Expected Monthly Revenue
               </Text>
-              <Text style={styles.value}>
+              <Text style={[styles.value, { textAlign: "left" }]}>
                 {formData?.expectedMonthlyRevenue}
               </Text>
             </View>
@@ -166,27 +193,33 @@ const PdfDocument = ({
               <Text style={[styles.description, { color: "#00bf8f" }]}>
                 Average Booking Per Month
               </Text>
-              <Text style={styles.value}>{formData?.averageBooking}</Text>
+              <Text style={[styles.value, { textAlign: "left" }]}>
+                {formData?.averageBooking}
+              </Text>
             </View>
             <View style={styles.tableRow}>
               <Text style={[styles.description, { color: "#00bf8f" }]}>
                 Number of Pods
               </Text>
-              <Text style={styles.value}>{formData?.numberOfPods}</Text>
+              <Text style={[styles.value, { textAlign: "left" }]}>
+                {formData?.numberOfPods}
+              </Text>
             </View>
             <View style={styles.tableRow}>
               <Text style={[styles.description, { color: "#00bf8f" }]}>
                 Expected Occupancy Rate (%)
               </Text>
-              <Text style={styles.value}>
-                {formData?.expectedOccupancyPercentage}
+              <Text style={[styles.value, { textAlign: "left" }]}>
+                {Number(formData?.expectedOccupancyPercentage).toFixed(2)}
               </Text>
             </View>
             <View style={styles.tableRow}>
               <Text style={[styles.description, { color: "#00bf8f" }]}>
                 Franchisor Commission Rate (%)
               </Text>
-              <Text style={styles.value}>{commission}</Text>
+              <Text style={[styles.value, { textAlign: "left" }]}>
+                {commission}
+              </Text>
             </View>
           </View>
           <Text style={styles.title}>Pod Rent Calculation Report</Text>
@@ -203,7 +236,11 @@ const PdfDocument = ({
                 <Text
                   style={[
                     styles.expenses,
-                    { borderTop: "1px solid #000", padding: 8.5 },
+                    {
+                      borderTop: "1px solid #000",
+                      padding: 8,
+                      color: "#00bf8f",
+                    },
                   ]}
                 >
                   Expenses
@@ -211,7 +248,11 @@ const PdfDocument = ({
                 <Text
                   style={[
                     styles.amount,
-                    { padding: 8.5, borderTop: "1px solid #000" },
+                    {
+                      padding: 8,
+                      borderTop: "1px solid #000",
+                      color: "#00bf8f",
+                    },
                   ]}
                 >
                   Amount
@@ -219,32 +260,64 @@ const PdfDocument = ({
                 <Text
                   style={[
                     styles.category,
-                    { padding: 8.5, borderTop: "1px solid #000" },
+                    {
+                      padding: 8,
+                      borderTop: "1px solid #000",
+                      color: "#00bf8f",
+                    },
                   ]}
                 >
                   Category
                 </Text>
                 <Text
-                  style={[styles.constant, { borderTop: "1px solid #000" }]}
+                  style={[
+                    styles.constant,
+                    { borderTop: "1px solid #000", color: "#00bf8f" },
+                  ]}
                 >
                   Monthly Conversion Constant
                 </Text>
                 <Text
                   style={[
                     styles.monthlyAmount,
-                    { borderTop: "1px solid #000" },
+                    { borderTop: "1px solid #000", color: "#00bf8f" },
                   ]}
                 >
-                  Monthly Equivalent
+                  Monthly {"    "} Equivalent
                 </Text>
               </View>
-              <View style={styles.tableExpensesRow}>
-                <Text style={styles.expenses}></Text>
-                <Text style={styles.amount}></Text>
-                <Text style={styles.category}></Text>
-                <Text style={styles.constant}></Text>
-                <Text style={styles.monthlyAmount}></Text>
-              </View>
+              {expenses.map((expense, index) => {
+                const { expense_head, amount, categoryId } = expense;
+
+                let ConstantName, conversionConstant;
+                if (categoryId === "12") {
+                  ConstantName = "Per Booking";
+                  conversionConstant = Number(formData.averageBooking); // Assuming formData contains the averageBooking value
+                  console.log(
+                    "formData.averageBooking",
+                    formData.averageBooking
+                  );
+                } else {
+                  ConstantName = getConstantName(categoryId);
+                  conversionConstant = getCategoryConstant(categoryId);
+                }
+                console.log(conversionConstant);
+                const monthlyEquivalent = amount * conversionConstant;
+                console.log("ConstantName", ConstantName);
+                return (
+                  <View key={index} style={styles.tableExpensesRow}>
+                    <Text style={styles.expenses}>{expense_head}</Text>
+                    <Text style={styles.amount}>{amount.toFixed(2)}</Text>
+                    <Text style={styles.category}>{ConstantName}</Text>
+                    <Text style={styles.constant}>
+                      {conversionConstant.toFixed(2)}
+                    </Text>
+                    <Text style={styles.monthlyAmount}>
+                      {monthlyEquivalent.toFixed(2)}
+                    </Text>
+                  </View>
+                );
+              })}
             </View>
           </View>
           {/* Pod rent table data*/}
@@ -257,12 +330,13 @@ const PdfDocument = ({
                 <Text
                   style={[styles.description, { borderTop: "1px solid #000" }]}
                 >
-                  Occupied Pods Per Month considering occupancy rate (Estimated)
+                  Occupied Pods Per Month considering occupancy rate {"   "}
+                  (Estimated)
                 </Text>
                 <Text
                   style={[
                     styles.value,
-                    { padding: 8.5, borderTop: "1px solid #000" },
+                    { padding: 8, borderTop: "1px solid #000" },
                   ]}
                 >
                   {calculatedResults?.occupiedRoomsPerMonth.toFixed(2)}
@@ -341,7 +415,7 @@ const PdfDocument = ({
               </View>
               <View style={styles.tableRow}>
                 <Text style={styles.description}>
-                  Total Monthly Income (at
+                  Total Monthly Income (at{" "}
                   {formData?.expectedOccupancyPercentage}% Occupancy)
                 </Text>
                 <Text style={styles.value}>
@@ -384,30 +458,14 @@ export default function PdfExportButton({
   reverseCalculationResults,
   formData,
   commission,
+  expenses,
+  categories,
 }) {
-  const [expenses, setExpenses] = useState([]);
-  const [categories, setCategories] = useState([]);
-
   const now = new Date();
   const formattedDate = now.toISOString().split("T")[0]; // Get YYYY-MM-DD
   const formattedTime = now.toTimeString().split(" ")[0].replace(/:/g, ""); // Get hhmmss
   const fileName = `PodRentPerDayReport${formattedDate}-${formattedTime}.xlsx`;
 
-  useEffect(() => {
-    const fetchData = async () => {
-      // Fetch all expenses
-      const fetchedExpenses = await db.expenses.toArray();
-      setExpenses(fetchedExpenses);
-
-      // Fetch all categories with their conversion constants
-      const fetchedCategories = await db.category_constants.toArray();
-      setCategories(fetchedCategories);
-    };
-
-    fetchData();
-  }, []);
-  console.log("expenses", expenses);
-  console.log("categories:", categories);
   return (
     <PDFDownloadLink
       document={
@@ -416,6 +474,8 @@ export default function PdfExportButton({
           reverseCalculationResults={reverseCalculationResults}
           formData={formData}
           commission={commission}
+          expenses={expenses}
+          categories={categories}
         />
       }
       fileName={fileName}
