@@ -15,7 +15,8 @@ import {
 import { useLoaderData } from "react-router-dom";
 import { db } from "../db/db";
 import "../styles/form.css";
-import { getMissingCategoryConstants } from "../constant/Constants";
+import { getMissingCategoryConstants, monthNames } from "../constant/Constants";
+import PdfExportButton from "../components/PdfExportButton";
 
 // Loader function defined here to fetch data
 export async function rentalRateCalculatorLoader() {
@@ -47,6 +48,7 @@ export default function RentalRateCalculator() {
   const [reverseCalculationResults, setreverseCalculationResults] =
     useState(null);
   const [missingCategories, setMissingCategories] = useState([]);
+  const commissionRate = parseFloat(commission[0].commission_rate).toFixed(2);
 
   useEffect(() => {
     // Fetch missing categories on component mount
@@ -71,7 +73,7 @@ export default function RentalRateCalculator() {
         const category = categories.find(
           (cat) => Number(cat.categoryId) === Number(expense.categoryId)
         );
-        multiplier = category ? category.monthly_conversion_constant : 1; // Use 1 if no multiplier exists
+        multiplier = category?.monthly_conversion_constant;
       }
       totalMonthlyExpenses += expense.amount * multiplier;
     });
@@ -145,7 +147,6 @@ export default function RentalRateCalculator() {
       (totalExpensesPerOccupiedRoomDay + revenuePerOccupiedRoomDay).toFixed(2)
     );
 
-    const commissionRate = parseFloat(commission[0].commission_rate).toFixed(2);
     if (commissionRate <= 0) {
       console.error("Commission rate should be greater than 0.");
       return;
@@ -319,18 +320,11 @@ export default function RentalRateCalculator() {
                   aria-label="Month"
                 >
                   <option value="">Select Month</option>
-                  <option value="1">January</option>
-                  <option value="2">February</option>
-                  <option value="3">March</option>
-                  <option value="4">April</option>
-                  <option value="5">May</option>
-                  <option value="6">June</option>
-                  <option value="7">July</option>
-                  <option value="8">August</option>
-                  <option value="9">September</option>
-                  <option value="10">October</option>
-                  <option value="11">November</option>
-                  <option value="12">December</option>
+                  {monthNames.slice(1).map((month, index) => (
+                    <option key={index + 1} value={index + 1}>
+                      {month}
+                    </option>
+                  ))}
                 </Input>
                 <FormFeedback>{errors.month}</FormFeedback>
               </FormGroup>
@@ -474,145 +468,163 @@ export default function RentalRateCalculator() {
 
       {/* Display Calculated Results in a Table */}
       {calculatedResults && (
-        <Container>
-          <Row>
-            {/* First Table */}
-            <Col lg="6" md="6" sm="12">
-              <Table
-                hover
-                responsive
-                aria-label="Per Pod Rent Per Day Calcualtion Table"
-              >
-                <thead>
-                  <tr>
-                    <th colSpan="2" className="text-center table-header">
-                      Per Pod Rent Per Day Calcualtion
-                    </th>
-                  </tr>
-                  <tr>
-                    <th>Description</th>
-                    <th>Amount</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>
-                      Occupied Pods Per Month considering occupancy rate
-                      (Estimated)
-                    </td>
-                    <td>
-                      {calculatedResults.occupiedRoomsPerMonth.toFixed(2)}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>Total Pod Occupied Days</td>
-                    <td>
-                      {calculatedResults.totalOccupiedRoomDays.toFixed(2)}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>Total Monthly Expenses</td>
-                    <td>{calculatedResults.totalMonthlyExpenses.toFixed(2)}</td>
-                  </tr>
-                  <tr>
-                    <td>Expenses per Occupied Pod</td>
-                    <td>
-                      {calculatedResults.totalExpensesPerOccupiedRoomDay.toFixed(
-                        2
-                      )}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>Revenue per Occupied Pod</td>
-                    <td>
-                      {calculatedResults.revenuePerOccupiedRoomDay.toFixed(2)}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>Expected Daily Rent (with Expenses)</td>
-                    <td>
-                      {calculatedResults.expectedRentPerDayWithAllExpenses.toFixed(
-                        2
-                      )}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>Franchisor Commission</td>
-                    <td>{calculatedResults.franchiserCommission.toFixed(2)}</td>
-                  </tr>
-                  <tr>
-                    <td className="table-header">Per Pod Rent Per Day</td>
-                    <td className="table-header">
-                      {calculatedResults.expectedRentPerDayWithAllExpensesAndCommission.toFixed(
-                        2
-                      )}
-                    </td>
-                  </tr>
-                </tbody>
-              </Table>
-            </Col>
+        <>
+          <Container className="text-center">
+            {calculatedResults && reverseCalculationResults && (
+              <PdfExportButton
+                calculatedResults={calculatedResults}
+                reverseCalculationResults={reverseCalculationResults}
+                formData={formData}
+                commission={commissionRate}
+              />
+            )}
+          </Container>
+          <Container>
+            <Row>
+              {/* First Table */}
+              <Col lg="6" md="6" sm="12">
+                <Table
+                  hover
+                  responsive
+                  aria-label="Per Pod Rent Per Day Calcualtion Table"
+                >
+                  <thead>
+                    <tr>
+                      <th colSpan="2" className="text-center table-header">
+                        Per Pod Rent Per Day Calcualtion
+                      </th>
+                    </tr>
+                    <tr>
+                      <th>Description</th>
+                      <th>Amount</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        Occupied Pods Per Month considering occupancy rate
+                        (Estimated)
+                      </td>
+                      <td>
+                        {calculatedResults.occupiedRoomsPerMonth.toFixed(2)}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Total Pod Occupied Days</td>
+                      <td>
+                        {calculatedResults.totalOccupiedRoomDays.toFixed(2)}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Total Monthly Expenses</td>
+                      <td>
+                        {calculatedResults.totalMonthlyExpenses.toFixed(2)}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Expenses per Occupied Pod</td>
+                      <td>
+                        {calculatedResults.totalExpensesPerOccupiedRoomDay.toFixed(
+                          2
+                        )}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Revenue per Occupied Pod</td>
+                      <td>
+                        {calculatedResults.revenuePerOccupiedRoomDay.toFixed(2)}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Expected Daily Rent (with Expenses)</td>
+                      <td>
+                        {calculatedResults.expectedRentPerDayWithAllExpenses.toFixed(
+                          2
+                        )}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Franchisor Commission</td>
+                      <td>
+                        {calculatedResults.franchiserCommission.toFixed(2)}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="table-header">Per Pod Rent Per Day</td>
+                      <td className="table-header">
+                        {calculatedResults.expectedRentPerDayWithAllExpensesAndCommission.toFixed(
+                          2
+                        )}
+                      </td>
+                    </tr>
+                  </tbody>
+                </Table>
+              </Col>
 
-            {/* Second Table */}
-            <Col lg="6" md="6" sm="12">
-              <Table hover responsive aria-label="Monthly Summary Table">
-                <thead>
-                  <tr>
-                    <th colSpan="2" className="text-center table-header">
-                      Monthly Summary
-                    </th>
-                  </tr>
-                  <tr>
-                    <th>Description</th>
-                    <th>Amount</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>Pod Rent Per Day</td>
-                    <td>
-                      {reverseCalculationResults.expectedRentPerDayWithAllExpensesAndCommission.toFixed(
-                        2
-                      )}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      Total Monthly Income (at{" "}
-                      {formData.expectedOccupancyPercentage}% Occupancy)
-                    </td>
-                    <td>
-                      {reverseCalculationResults.amountFromCustomer.toFixed(2)}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>Total Monthly Expensesh</td>
-                    <td>
-                      {reverseCalculationResults.totalMonthlyExpenses.toFixed(
-                        2
-                      )}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>Franchisor Commission</td>
-                    <td>
-                      {reverseCalculationResults.reverseFranchisorCommission.toFixed(
-                        2
-                      )}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>Net Franchisee Income (Before Tax)</td>
-                    <td>
-                      {reverseCalculationResults.balanceAfterCommission.toFixed(
-                        2
-                      )}
-                    </td>
-                  </tr>
-                </tbody>
-              </Table>
-            </Col>
-          </Row>
-        </Container>
+              {/* Second Table */}
+              <Col lg="6" md="6" sm="12">
+                <Table hover responsive aria-label="Monthly Summary Table">
+                  <thead>
+                    <tr>
+                      <th colSpan="2" className="text-center table-header">
+                        Monthly Summary
+                      </th>
+                    </tr>
+                    <tr>
+                      <th>Description</th>
+                      <th>Amount</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Pod Rent Per Day</td>
+                      <td>
+                        {reverseCalculationResults.expectedRentPerDayWithAllExpensesAndCommission.toFixed(
+                          2
+                        )}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        Total Monthly Income (at{" "}
+                        {formData.expectedOccupancyPercentage}% Occupancy)
+                      </td>
+                      <td>
+                        {reverseCalculationResults.amountFromCustomer.toFixed(
+                          2
+                        )}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Total Monthly Expensesh</td>
+                      <td>
+                        {reverseCalculationResults.totalMonthlyExpenses.toFixed(
+                          2
+                        )}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Franchisor Commission</td>
+                      <td>
+                        {reverseCalculationResults.reverseFranchisorCommission.toFixed(
+                          2
+                        )}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Net Franchisee Income (Before Tax)</td>
+                      <td>
+                        {reverseCalculationResults.balanceAfterCommission.toFixed(
+                          2
+                        )}
+                      </td>
+                    </tr>
+                  </tbody>
+                </Table>
+              </Col>
+            </Row>
+          </Container>
+        </>
       )}
     </>
   );
