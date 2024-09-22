@@ -9,6 +9,8 @@ import {
   Container,
   FormFeedback,
   Table,
+  Row,
+  Col,
 } from "reactstrap";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { db } from "../db/db";
@@ -342,17 +344,16 @@ export default function ExpenseCategoryManagement() {
           </fieldset>
         </Form>
         {missingCategories.length > 0 && (
-          <div className="missingCategory">
-            <h5>
+          <div className="missingCategory-container">
+            <div className="missingCategory-title">Important Notice</div>
+            <p>
               {missingCategories.length === 1
                 ? "Please Provide the Monthly Conversion Constant for the Following Category:"
                 : "Please Provide the Monthly Conversion Constants for the Following Categories:"}
-            </h5>
-            <ul className="missing-categories-list">
+            </p>
+            <ul className="missingCategory-list">
               {missingCategories.map((missingCategory) => (
-                <li key={missingCategory.id} className="missing-category-item">
-                  {missingCategory.name}
-                </li>
+                <li key={missingCategory.id}>{missingCategory.name}</li>
               ))}
             </ul>
           </div>
@@ -373,7 +374,7 @@ export default function ExpenseCategoryManagement() {
                   Monthly Conversion Constant
                 </th>
               </tr>
-              <tr>
+              <tr style={{ textAlign: "center" }}>
                 <th>Category</th>
                 <th>Monthly Conversion Constant</th>
                 <th>Actions</th>
@@ -385,23 +386,27 @@ export default function ExpenseCategoryManagement() {
                   <td>{constant.name}</td>
                   <td>{constant.monthly_conversion_constant}</td>
                   <td>
-                    <FaEdit
-                      style={{
-                        cursor: "pointer",
-                        marginRight: "20px",
-                      }}
-                      onClick={() => handleEdit(constant)}
-                      aria-label="Edit Monthly Conversion Constant"
-                    />
-                    <FaTrash
-                      style={{
-                        cursor: "pointer",
-                        marginLeft: "10px",
-                        color: "red",
-                      }}
-                      onClick={() => handleDelete(constant)}
-                      aria-label="Delete Monthly Conversion Constant"
-                    />
+                    <Row>
+                      <Col xs="12" md="auto">
+                        <FaEdit
+                          style={{
+                            cursor: "pointer",
+                          }}
+                          onClick={() => handleEdit(constant)}
+                          aria-label="Edit Monthly Conversion Constant"
+                        />
+                      </Col>
+                      <Col xs="12" md="auto">
+                        <FaTrash
+                          style={{
+                            cursor: "pointer",
+                            color: "red",
+                          }}
+                          onClick={() => handleDelete(constant)}
+                          aria-label="Delete Monthly Conversion Constant"
+                        />
+                      </Col>
+                    </Row>
                   </td>
                 </tr>
               ))}

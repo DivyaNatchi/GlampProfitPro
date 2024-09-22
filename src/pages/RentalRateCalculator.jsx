@@ -16,6 +16,7 @@ import { useLoaderData } from "react-router-dom";
 import { db } from "../db/db";
 import "../styles/form.css";
 import { getMissingCategoryConstants, monthNames } from "../constant/Constants";
+import "../fontRegistration";
 import PdfExportButton from "../components/PdfExportButton";
 
 // Loader function defined here to fetch data
@@ -449,17 +450,16 @@ export default function RentalRateCalculator() {
           </fieldset>
         </Form>
         {missingCategories.length > 0 && (
-          <div className="missingCategory">
-            <h5>
+          <div className="missingCategory-container">
+            <div className="missingCategory-title">Important Notice</div>
+            <p>
               {missingCategories.length === 1
                 ? "Please contact the Franchisor, the following monthly conversion constant is not available for Rental Calculation:"
                 : "Please contact the Franchisor, the following monthly conversion constants are not available for Rental Calculation:"}
-            </h5>
-            <ul className="missing-categories-list">
+            </p>
+            <ul className="missingCategory-list">
               {missingCategories.map((missingCategory) => (
-                <li key={missingCategory.id} className="missing-category-item">
-                  {missingCategory.name}
-                </li>
+                <li key={missingCategory.id}>{missingCategory.name}</li>
               ))}
             </ul>
           </div>

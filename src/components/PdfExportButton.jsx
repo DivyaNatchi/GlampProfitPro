@@ -1,5 +1,4 @@
 // PdfExportButton.js
-import React, { useEffect, useState } from "react";
 import {
   PDFDownloadLink,
   Document,
@@ -9,15 +8,18 @@ import {
   StyleSheet,
   Image,
 } from "@react-pdf/renderer";
-import { db } from "../db/db";
 import { monthNames, wigwamLogo } from "../constant/Constants.jsx";
 
 // Define styles for the PDF content
 const styles = StyleSheet.create({
   page: {
-    padding: 40, // This applies 40 to all sides (top, right, bottom, left)
-    paddingHorizontal: 30, // This applies 30 to left and right
+    padding: 20, // This applies 40 to all sides (top, right, bottom, left)
+    // paddingHorizontal: 30, // This applies 30 to left and right
     fontSize: 10,
+    fontFamily: "Open Sans",
+  },
+  section: {
+    alignItems: "center",
   },
   header: {
     backgroundColor: "#00bf8f",
@@ -28,90 +30,103 @@ const styles = StyleSheet.create({
     border: "1px solid #000",
   },
   logo: {
-    width: 20,
-    height: 20,
+    width: 40,
+    height: 40,
+    textAlign: "center",
+    marginBottom: 2,
   },
   title: {
     color: "#fff",
     textAlign: "center",
+    fontSize: 11.5,
+    fontWeight: "700",
   },
   tableHeader: {
     backgroundColor: "#00bf8f", // Background color
-    padding: 5,
+    padding: 2,
     alignItems: "center",
     borderTop: "1px solid #000",
     borderRight: "1px solid #000",
+    borderBottom: "1px solid #000",
     borderLeft: "1px solid #000",
-    fontSize: 15,
     color: "#fff",
-    fontWeight: "bold",
+    fontSize: 11.5,
+    fontWeight: 700,
     textAlign: "center",
   },
   dateSection: {
     textAlign: "right",
-    marginTop: 10,
-    marginBottom: 10,
+    marginTop: 5,
   },
   table: {
     display: "table",
     width: "auto",
-    marginBottom: 10,
+    marginTop: 5,
+    marginBottom: 5,
   },
   tableRow: {
     flexDirection: "row",
     alignItems: "center",
+    borderBottom: "1px solid #000",
   },
   description: {
-    width: "50%",
-    padding: 2,
+    width: "55%",
+    padding: 1,
     borderRight: "1px solid #000",
     borderLeft: "1px solid #000",
-    borderBottom: "1px solid #000",
   },
   value: {
-    width: "50%",
-    padding: 2,
+    width: "45%",
+    padding: 1,
     borderRight: "1px solid #000",
-    borderBottom: "1px solid #000",
     textAlign: "right",
   },
   tableExpensesRow: {
     flexDirection: "row",
+    borderBottom: "1px solid #000",
     alignItems: "center",
   },
   expenses: {
-    width: "35%",
-    padding: 2,
+    width: "40%",
+    padding: 1,
     borderRight: "1px solid #000",
     borderLeft: "1px solid #000",
-    borderBottom: "1px solid #000",
   },
   amount: {
-    width: "10%",
-    padding: 2,
+    width: "15%",
+    padding: 1,
     borderRight: "1px solid #000",
-    borderBottom: "1px solid #000",
     textAlign: "right",
   },
   category: {
-    width: "20%",
-    padding: 2,
+    width: "15%",
+    padding: 1,
     borderRight: "1px solid #000",
-    borderBottom: "1px solid #000",
   },
   constant: {
-    width: "20%",
-    padding: 2,
+    width: "15%",
+    padding: 1,
     borderRight: "1px solid #000",
-    borderBottom: "1px solid #000",
     textAlign: "right",
   },
   monthlyAmount: {
     width: "15%",
-    padding: 2,
+    padding: 1,
     borderRight: "1px solid #000",
-    borderBottom: "1px solid #000",
     textAlign: "right",
+  },
+  totalExpensesRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderBottom: "1px solid #000",
+    color: "#00bf8f",
+  },
+  totalMonthlyExpenses: {
+    width: "85%",
+    padding: 2,
+    textAlign: "right",
+    borderLeft: "1px solid #000",
+    borderRight: "1px solid #000",
   },
 });
 
@@ -124,12 +139,23 @@ const PdfDocument = ({
   expenses,
   categories,
 }) => {
-  console.log("formData", formData);
-  console.log("PdfDocument : categories", categories);
+  // Function to get formatted date and time
+  const getFormattedDateTime = (date) => {
+    const day = date.getDate();
+    const month = monthNames[date.getMonth()].slice(0, 3); // Get the first three letters of the month
+    const year = date.getFullYear();
+    const formattedDate = `${day}-${month}-${year}`;
 
-  // Set current date and time
-  const currentDate = new Date().toLocaleDateString();
-  const currentTime = new Date().toLocaleTimeString();
+    const formattedTime = date.toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    });
+
+    return { formattedDate, formattedTime };
+  };
+  // Get current date and time
+  const { formattedDate, formattedTime } = getFormattedDateTime(new Date());
 
   const getCategoryConstant = (categoryId) => {
     const category = categories.find(
@@ -139,8 +165,6 @@ const PdfDocument = ({
   };
 
   const getConstantName = (categoryId) => {
-    console.log("getConstantName : categoryId", categoryId);
-    console.log("getConstantName : categories", categories);
     return categories.find(
       (cat) => Number(cat.categoryId) === Number(categoryId)
     )?.name;
@@ -149,16 +173,13 @@ const PdfDocument = ({
   return (
     <Document>
       <Page style={styles.page}>
-        {/* Header Section */}
-        <View style={styles.header}>
+        <View style={styles.section}>
           <Image src={wigwamLogo} style={styles.logo} />
-          <Text style={[styles.title, { fontWeight: "900" }]}>
-            Pod Rent Calculation
-          </Text>
         </View>
+        <Text style={styles.tableHeader}>Pod Rent Calculation</Text>
         <View>
           <Text style={styles.dateSection}>
-            Date: {currentDate} | Time: {currentTime}
+            Date: {formattedDate} | Time: {formattedTime}
           </Text>
         </View>
         <View>
@@ -222,23 +243,18 @@ const PdfDocument = ({
               </Text>
             </View>
           </View>
-          <Text style={styles.title}>Pod Rent Calculation Report</Text>
           {/* Monthly Expenses Table data*/}
-          <View style={styles.section}>
+          <View style={styles.table}>
             <Text style={styles.tableHeader}>Monthly Expenses</Text>
-            <View style={styles.table}>
-              <View
-                style={[
-                  styles.tableExpensesRow,
-                  { borderTop: "1px solid #000" },
-                ]}
-              >
+            <View>
+              <View style={styles.tableExpensesRow}>
                 <Text
                   style={[
                     styles.expenses,
                     {
-                      borderTop: "1px solid #000",
-                      padding: 8,
+                      padding: 15,
+                      textAlign: "center",
+                      fontWeight: "700",
                       color: "#00bf8f",
                     },
                   ]}
@@ -249,8 +265,9 @@ const PdfDocument = ({
                   style={[
                     styles.amount,
                     {
-                      padding: 8,
-                      borderTop: "1px solid #000",
+                      padding: 15,
+                      textAlign: "center",
+                      fontWeight: "700",
                       color: "#00bf8f",
                     },
                   ]}
@@ -261,8 +278,9 @@ const PdfDocument = ({
                   style={[
                     styles.category,
                     {
-                      padding: 8,
-                      borderTop: "1px solid #000",
+                      padding: 15,
+                      textAlign: "center",
+                      fontWeight: "700",
                       color: "#00bf8f",
                     },
                   ]}
@@ -272,18 +290,27 @@ const PdfDocument = ({
                 <Text
                   style={[
                     styles.constant,
-                    { borderTop: "1px solid #000", color: "#00bf8f" },
+                    {
+                      textAlign: "center",
+                      fontWeight: "700",
+                      color: "#00bf8f",
+                    },
                   ]}
                 >
-                  Monthly Conversion Constant
+                  Monthly{"\n"}Conversion{"\n"}Constant
                 </Text>
                 <Text
                   style={[
                     styles.monthlyAmount,
-                    { borderTop: "1px solid #000", color: "#00bf8f" },
+                    {
+                      textAlign: "center",
+                      fontWeight: "700",
+                      padding: 8,
+                      color: "#00bf8f",
+                    },
                   ]}
                 >
-                  Monthly {"    "} Equivalent
+                  Monthly{"\n"}Equivalent
                 </Text>
               </View>
               {expenses.map((expense, index) => {
@@ -301,43 +328,95 @@ const PdfDocument = ({
                   ConstantName = getConstantName(categoryId);
                   conversionConstant = getCategoryConstant(categoryId);
                 }
-                console.log(conversionConstant);
                 const monthlyEquivalent = amount * conversionConstant;
-                console.log("ConstantName", ConstantName);
+
                 return (
                   <View key={index} style={styles.tableExpensesRow}>
-                    <Text style={styles.expenses}>{expense_head}</Text>
-                    <Text style={styles.amount}>{amount.toFixed(2)}</Text>
-                    <Text style={styles.category}>{ConstantName}</Text>
-                    <Text style={styles.constant}>
+                    <Text style={styles.expenses}>
+                      {expense_head.length > 80
+                        ? `${expense_head.slice(0, 75)}...`
+                        : expense_head}
+                    </Text>
+                    <Text
+                      style={[
+                        styles.amount,
+                        expense_head.length > 40 && {
+                          paddingTop: 9,
+                          paddingBottom: 9,
+                        },
+                      ]}
+                    >
+                      {amount.toFixed(2)}
+                    </Text>
+                    <Text
+                      style={[
+                        styles.category,
+                        expense_head.length > 40 && {
+                          paddingTop: 9,
+                          paddingBottom: 9,
+                        },
+                      ]}
+                    >
+                      {ConstantName}
+                    </Text>
+                    <Text
+                      style={[
+                        styles.constant,
+                        expense_head.length > 40 && {
+                          paddingTop: 9,
+                          paddingBottom: 9,
+                        },
+                      ]}
+                    >
                       {conversionConstant.toFixed(2)}
                     </Text>
-                    <Text style={styles.monthlyAmount}>
+                    <Text
+                      style={[
+                        styles.monthlyAmount,
+                        expense_head.length > 40 && {
+                          paddingTop: 9,
+                          paddingBottom: 9,
+                        },
+                      ]}
+                    >
                       {monthlyEquivalent.toFixed(2)}
                     </Text>
                   </View>
                 );
               })}
+              <View
+                style={[
+                  styles.totalExpensesRow,
+                  {
+                    fontWeight: 700,
+                  },
+                ]}
+              >
+                <Text style={styles.totalMonthlyExpenses}>
+                  Total Monthly Expenses
+                </Text>
+                <Text style={styles.monthlyAmount}>
+                  {calculatedResults?.totalMonthlyExpenses.toFixed(2)}
+                </Text>
+              </View>
             </View>
           </View>
+
           {/* Pod rent table data*/}
-          <View>
-            <Text style={styles.tableHeader}>
+          <View style={styles.table}>
+            <Text
+              style={[styles.tableHeader, { borderBottom: "1px solid #000" }]}
+            >
               Per Pod Rent Per Day Calculation
             </Text>
-            <View style={styles.table}>
+            <View>
               <View style={styles.tableRow}>
-                <Text
-                  style={[styles.description, { borderTop: "1px solid #000" }]}
-                >
-                  Occupied Pods Per Month considering occupancy rate {"   "}
+                <Text style={styles.description}>
+                  Occupied Pods Per Month considering occupancy rate {"\n"}
                   (Estimated)
                 </Text>
                 <Text
-                  style={[
-                    styles.value,
-                    { padding: 8, borderTop: "1px solid #000" },
-                  ]}
+                  style={[styles.value, { paddingTop: 8, paddingBottom: 8 }]}
                 >
                   {calculatedResults?.occupiedRoomsPerMonth.toFixed(2)}
                 </Text>
@@ -387,8 +466,20 @@ const PdfDocument = ({
                 </Text>
               </View>
               <View style={[styles.tableRow, { backgroundColor: "#00bf8f" }]}>
-                <Text style={styles.description}>Per Pod Rent Per Day</Text>
-                <Text style={styles.value}>
+                <Text
+                  style={[
+                    styles.description,
+                    { backgroundColor: "#00bf8f", color: "#fff" },
+                  ]}
+                >
+                  Per Pod Rent Per Day
+                </Text>
+                <Text
+                  style={[
+                    styles.value,
+                    { backgroundColor: "#00bf8f", color: "#fff" },
+                  ]}
+                >
                   {calculatedResults?.expectedRentPerDayWithAllExpensesAndCommission.toFixed(
                     2
                   )}
@@ -398,16 +489,16 @@ const PdfDocument = ({
           </View>
 
           {/* Monthly summary table data */}
-          <View>
-            <Text style={styles.tableHeader}>Monthly Summary</Text>
-            <View style={styles.table}>
+          <View style={styles.table}>
+            <Text
+              style={[styles.tableHeader, { borderBottom: "1px solid #000" }]}
+            >
+              Monthly Summary
+            </Text>
+            <View>
               <View style={styles.tableRow}>
-                <Text
-                  style={[styles.description, { borderTop: "1px solid #000" }]}
-                >
-                  Pod Rent Per Day
-                </Text>
-                <Text style={[styles.value, { borderTop: "1px solid #000" }]}>
+                <Text style={styles.description}>Pod Rent Per Day</Text>
+                <Text style={styles.value}>
                   {reverseCalculationResults?.expectedRentPerDayWithAllExpensesAndCommission.toFixed(
                     2
                   )}

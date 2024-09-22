@@ -33,14 +33,39 @@ main {
   background: linear-gradient(90deg, #009e74, #0777d1);
 }
 
-.missingCategory {
-  margin-top: 30px;
+.missingCategory-container {
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  max-width: 600px;
+  margin: 20px auto; /* Center the message */
+  text-align: center; /* Center the text */
 }
-.missing-categories-list {
-  padding: 0 0 0 40px;
+.missingCategory-title {
+  background-color: #00bf8f; /* Light theme color */
+  color: white; /* Text color for contrast */
+  font-size: 1.5em;
+  font-weight: bold;
+  margin-bottom: 10px;
+  border-radius: 5px;
 }
 
-.missing-category-item {
-  padding: 10px;
-  color: #007b5e;
+.missingCategory-list {
+  display: grid; /* Use CSS Grid */
+  grid-template-columns: repeat(1, 1fr); /* 1 column by default */
+  gap: 10px; /* Space between items */
+  padding: 0; /* Remove padding */
+  list-style-type: none; /* Remove bullet points */
+}
+
+.missingCategory-list li {
+  font-size: 1.2em;
+  border: 1px solid #ddd;
+}
+
+/* Media query for medium and larger devices */
+@media (min-width: 576px) {
+  .missingCategory-list {
+    grid-template-columns: repeat(3, 1fr); /* 3 columns on md and lg */
+  }
 }

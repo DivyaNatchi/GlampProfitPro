@@ -9,6 +9,8 @@ import {
   Button,
   Container,
   FormFeedback,
+  Row,
+  Col,
 } from "reactstrap";
 import { useLoaderData } from "react-router-dom";
 import { db } from "../db/db";
@@ -69,6 +71,8 @@ export default function ExpenseManagement() {
       case "expense_head":
         if (!value.trim()) {
           error = "Please enter an expense head.";
+        } else if (value.length > 240) {
+          error = "Length allowed is 240 characters";
         }
         break;
       case "amount":
@@ -466,17 +470,17 @@ export default function ExpenseManagement() {
           </fieldset>
         </Form>
         {missingCategories.length > 0 && (
-          <div className="missingCategory">
-            <h5>
+          <div className="missingCategory-container">
+            {" "}
+            <div className="missingCategory-title">Important Notice</div>
+            <p>
               {missingCategories.length === 1
                 ? "Please contact the Franchisor, the following monthly conversion constant is not available:"
                 : "Please contact the Franchisor, the following monthly conversion constants are not available:"}
-            </h5>
-            <ul className="missing-categories-list">
+            </p>
+            <ul className="missingCategory-list">
               {missingCategories.map((missingCategory) => (
-                <li key={missingCategory.id} className="missing-category-item">
-                  {missingCategory.name}
-                </li>
+                <li key={missingCategory.id}>{missingCategory.name}</li>
               ))}
             </ul>
           </div>
@@ -498,7 +502,7 @@ export default function ExpenseManagement() {
                   />
                 </th>
               </tr>
-              <tr>
+              <tr style={{ textAlign: "center" }}>
                 <th>Expense Head</th>
                 <th>Amount</th>
                 <th>Category</th>
@@ -534,23 +538,27 @@ export default function ExpenseManagement() {
                       : "N/A"}
                   </td>
                   <td>
-                    <FaEdit
-                      style={{
-                        cursor: "pointer",
-                        marginRight: "20px",
-                      }}
-                      onClick={() => handleEdit(expense)}
-                      aria-label="Edit Expense"
-                    />
-                    <FaTrash
-                      style={{
-                        cursor: "pointer",
-                        marginLeft: "10px",
-                        color: "red",
-                      }}
-                      onClick={() => handleDelete(expense)}
-                      aria-label="Delete Expense"
-                    />
+                    <Row>
+                      <Col xs="12" md="auto">
+                        <FaEdit
+                          style={{
+                            cursor: "pointer",
+                          }}
+                          onClick={() => handleEdit(expense)}
+                          aria-label="Edit Expense"
+                        />
+                      </Col>
+                      <Col xs="12" md="auto">
+                        <FaTrash
+                          style={{
+                            cursor: "pointer",
+                            color: "red",
+                          }}
+                          onClick={() => handleDelete(expense)}
+                          aria-label="Delete Expense"
+                        />
+                      </Col>
+                    </Row>
                   </td>
                 </tr>
               ))}
