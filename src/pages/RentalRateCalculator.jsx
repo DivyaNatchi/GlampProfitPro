@@ -49,7 +49,9 @@ export default function RentalRateCalculator() {
   const [reverseCalculationResults, setreverseCalculationResults] =
     useState(null);
   const [missingCategories, setMissingCategories] = useState([]);
-  const commissionRate = parseFloat(commission[0].commission_rate).toFixed(2);
+  const commissionRate = commission[0]?.commission_rate
+    ? parseFloat(commission[0].commission_rate).toFixed(2)
+    : "0.00";
 
   useEffect(() => {
     // Fetch missing categories on component mount

@@ -25,7 +25,7 @@ export default function CommissionManagement() {
   const commissionData = useLoaderData();
   const [commissionRateInput, setCommissionRateInput] = useState("");
   const [commissionRateDisplay, setCommissionRateDisplay] = useState(
-    commissionData ? commissionData.commission_rate : ""
+    commissionData ? commissionData.commission_rate : "0.00"
   );
   const [errors, setErrors] = useState("");
   // const [lastUpdated, setLastUpdated] = useState(
